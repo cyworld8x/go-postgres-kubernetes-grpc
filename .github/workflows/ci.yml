@@ -42,11 +42,13 @@ jobs:
       with:
         go-version: '1.22'
     - name: Install golang-migrate   
-      run: curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-amd64.tar.gz | tar xvz
-
-    - name: Run seting up database 
-      run: make migrateup
+      run: |
+        curl -L https://github.com/golang-migrate/migrate/releases/download/v4.17.0/migrate.linux-amd64.tar.gz | tar xvz
         sudo mv migrate.linux-amd64 /usr/bin/migrate
         which migrate
+    - name: Run seting up database 
+      run: make migrateup
+       
+
     - name: Test
       run: go test -v ./...
