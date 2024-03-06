@@ -4,21 +4,23 @@ import (
 	"context"
 	"log"
 	"os"
+	"social/util"
 	"testing"
 
 	"github.com/jackc/pgx/v5"
 	_ "github.com/lib/pq"
 )
 
-const (
-	dbDriver = "postgres"
-	dbSource = "postgresql://postgres:postgres@localhost:20241/socialdb?sslmode=disable"
-)
-
 var testQueries *Queries
 
 func TestMain(m *testing.M) {
-	conn, err := pgx.Connect(context.Background(), dbSource)
+	config, err := util.LoadConfiguration("../..")
+
+	if err != nil {
+		log.Fatal("can not load env configuration:", err)
+	}
+
+	conn, err := pgx.Connect(context.Background(), config.DbSource)
 	if err != nil {
 		log.Fatal("can not connect to db:", err)
 	}
