@@ -22,9 +22,8 @@ func TestCreateUser(t *testing.T) {
 		Role:     pgtype.Text{String: "User", Valid: true},
 	}
 
-	userCreated, err := testQueries.CreateUser(context.Background(), user)
+	userCreated, err := testStore.CreateUser(context.Background(), user)
 	require.NotEqual(t, userCreated.ID, 0, "The user words should be the same.")
 	require.NoError(t, err, "Should not be error in creating a new user")
 	require.Equal(t, user.Username, userCreated.Username, "The user words should be the same.")
-
 }
