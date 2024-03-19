@@ -1,9 +1,10 @@
-package social
+package db
 
 import (
 	"context"
-	"social/util"
 	"testing"
+
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
@@ -12,13 +13,14 @@ import (
 func TestCreateUser(t *testing.T) {
 
 	genUser := util.GenAnUser()
-
+	pwd, err := util.HashPassword(genUser.Login.Password)
+	require.NoError(t, err, "Should not be error in creating a Hash Password")
 	user := CreateUserParams{
 
 		Username: pgtype.Text{String: genUser.Login.UserName, Valid: true},
 		Email:    pgtype.Text{String: genUser.Email, Valid: true},
 		Fullname: pgtype.Text{String: genUser.Name.First + " " + genUser.Name.Last, Valid: true},
-		Password: pgtype.Text{String: genUser.Login.Password, Valid: true},
+		Password: pgtype.Text{String: pwd, Valid: true},
 		Role:     pgtype.Text{String: "User", Valid: true},
 	}
 

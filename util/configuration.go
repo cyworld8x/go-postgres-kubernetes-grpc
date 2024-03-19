@@ -3,8 +3,9 @@ package util
 import "github.com/spf13/viper"
 
 type Configuration struct {
-	DbDriver string `mapstructure:"DB_DRIVER"`
-	DbSource string `mapstructure:"DB_SOURCE"`
+	DbDriver          string `mapstructure:"DB_DRIVER"`
+	DbSource          string `mapstructure:"DB_SOURCE"`
+	HTTPServerAddress string `mapstructure:"HTTP_SERVER_ADDRESS"`
 }
 
 // Configuration readling configuration from file

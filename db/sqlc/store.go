@@ -1,4 +1,4 @@
-package social
+package db
 
 import (
 	"context"

@@ -1,11 +1,12 @@
-package social
+package db
 
 import (
 	"context"
 	"log"
 	"os"
-	"social/util"
 	"testing"
+
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"

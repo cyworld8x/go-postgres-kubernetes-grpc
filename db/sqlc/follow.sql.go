@@ -3,7 +3,7 @@
 //   sqlc v1.25.0
 // source: follow.sql
 
-package social
+package db
 
 import (
 	"context"

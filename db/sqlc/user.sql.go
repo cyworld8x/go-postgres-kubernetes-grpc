@@ -3,7 +3,7 @@
 //   sqlc v1.25.0
 // source: user.sql
 
-package social
+package db
 
 import (
 	"context"
@@ -57,6 +57,26 @@ WHERE id = $1
 func (q *Queries) DeleteUser(ctx context.Context, id int32) error {
 	_, err := q.db.Exec(ctx, deleteUser, id)
 	return err
+}
+
+const getLogin = `-- name: GetLogin :one
+SELECT id, username, email, fullname, password, role, created_at FROM users
+WHERE username = $1 LIMIT 1
+`
+
+func (q *Queries) GetLogin(ctx context.Context, username pgtype.Text) (User, error) {
+	row := q.db.QueryRow(ctx, getLogin, username)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Username,
+		&i.Email,
+		&i.Fullname,
+		&i.Password,
+		&i.Role,
+		&i.CreatedAt,
+	)
+	return i, err
 }
 
 const getUser = `-- name: GetUser :one
