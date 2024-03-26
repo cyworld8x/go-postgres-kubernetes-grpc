@@ -3,6 +3,7 @@ module github.com/cyworld8x/go-postgres-kubernetes-grpc
 go 1.22.0
 
 require (
+	github.com/golang/mock v1.6.0
 	github.com/jackc/pgx/v5 v5.5.4
 	github.com/lib/pq v1.10.9
 	github.com/stretchr/testify v1.9.0
