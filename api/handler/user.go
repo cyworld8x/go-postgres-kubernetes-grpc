@@ -3,9 +3,11 @@ package api
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	presenter "github.com/cyworld8x/go-postgres-kubernetes-grpc/api/presenter"
 	db "github.com/cyworld8x/go-postgres-kubernetes-grpc/db/sqlc"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/paseto"
 	user "github.com/cyworld8x/go-postgres-kubernetes-grpc/usecase/user"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
 
@@ -25,6 +27,13 @@ type loginRequest struct {
 	Password string `json:"password"`
 }
 
+type loginResponse struct {
+	ID       int32  `json:"id"`
+	Username string `json:"username"`
+	Token    string `json:"token"`
+	Email    string `json:"email"`
+}
+
 func newUserResponse(user db.User) presenter.User {
 	return presenter.User{
 		ID:        user.ID,
@@ -34,6 +43,14 @@ func newUserResponse(user db.User) presenter.User {
 		Password:  user.Password.String,
 		Role:      user.Role.String,
 		CreatedAt: user.CreatedAt.Time,
+	}
+}
+
+func userLoginResponse(user db.User) loginResponse {
+	return loginResponse{
+		ID:       user.ID,
+		Username: user.Username.String,
+		Email:    user.Email.String,
 	}
 }
 
@@ -82,7 +99,13 @@ func getLogin(service user.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		rsp := newUserResponse(user)
+		rsp := userLoginResponse(user)
+		maker, _ := paseto.NewPasetoMaker()
+		token, _, err := maker.CreateToken(user.Username.String, time.Hour)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, err)
+		}
+		rsp.Token = token
 		ctx.JSON(http.StatusOK, rsp)
 	})
 
