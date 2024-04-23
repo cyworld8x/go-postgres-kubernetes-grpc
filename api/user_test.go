@@ -10,7 +10,7 @@ import (
 
 	mockdb "github.com/cyworld8x/go-postgres-kubernetes-grpc/db/mock"
 	entity "github.com/cyworld8x/go-postgres-kubernetes-grpc/db/sqlc"
-	util "github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/jackc/pgx/v5/pgtype"

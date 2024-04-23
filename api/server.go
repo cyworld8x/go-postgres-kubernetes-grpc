@@ -5,7 +5,7 @@ import (
 
 	db "github.com/cyworld8x/go-postgres-kubernetes-grpc/db/sqlc"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/usecase/user"
-	util "github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
 	"github.com/gin-gonic/gin"
 )
 

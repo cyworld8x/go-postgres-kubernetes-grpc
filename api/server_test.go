@@ -3,7 +3,7 @@ package api
 import (
 	"context"
 
-	util "github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
 	"github.com/jackc/pgx/v5/pgxpool"
 
 	db "github.com/cyworld8x/go-postgres-kubernetes-grpc/db/sqlc"
