@@ -91,7 +91,7 @@ func getLogin(service user.UseCase) gin.HandlerFunc {
 
 		user, err := service.GetLogin(req.Username)
 		if err != nil {
-			ctx.JSON(http.StatusOK, "User name doesn't match")
+			ctx.JSON(http.StatusBadRequest, "User name doesn't match")
 			return
 		}
 
