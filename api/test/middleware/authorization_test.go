@@ -1,4 +1,4 @@
-package api
+package middleware_test
 
 import (
 	"fmt"
@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	middleware "github.com/cyworld8x/go-postgres-kubernetes-grpc/api/middleware"
+	servertest "github.com/cyworld8x/go-postgres-kubernetes-grpc/api/test"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/paseto"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -15,14 +17,14 @@ import (
 
 func TestAuthMiddleware_ValidToken(t *testing.T) {
 	// Create a new Gin router
-	server, _ := NewTestServer()
+	serverTest, _ := servertest.NewTestServer(t)
 
 	// Create PasetoMaker
 	pasetoMaker, _ := paseto.NewPasetoMaker()
 	// Add the AuthMiddleware to the router
-	server.router.GET(
+	serverTest.Router.GET(
 		"/auth",
-		AuthMiddleware(pasetoMaker),
+		middleware.AuthMiddleware(pasetoMaker),
 		func(ctx *gin.Context) {
 			ctx.JSON(http.StatusOK, gin.H{})
 		},
@@ -39,7 +41,7 @@ func TestAuthMiddleware_ValidToken(t *testing.T) {
 	res := httptest.NewRecorder()
 
 	// Perform the request
-	server.router.ServeHTTP(res, req)
+	serverTest.Router.ServeHTTP(res, req)
 
 	// Assert that the response status code is 200 OK
 	assert.Equal(t, http.StatusOK, res.Code)
@@ -53,7 +55,7 @@ func TestAuthMiddleware_InvalidToken(t *testing.T) {
 	pasetoMaker, _ := paseto.NewPasetoMaker()
 
 	// Add the AuthMiddleware to the router
-	router.Use(AuthMiddleware(pasetoMaker))
+	router.Use(middleware.AuthMiddleware(pasetoMaker))
 
 	// Create a test request with an invalid token
 	req := httptest.NewRequest(http.MethodGet, "/", nil)
@@ -77,7 +79,7 @@ func TestAuthMiddleware_MissingToken(t *testing.T) {
 	pasetoMaker, _ := paseto.NewPasetoMaker()
 
 	// Add the AuthMiddleware to the router
-	router.Use(AuthMiddleware(pasetoMaker))
+	router.Use(middleware.AuthMiddleware(pasetoMaker))
 
 	// Create a test request without the Authorization header
 	req := httptest.NewRequest(http.MethodGet, "/", nil)

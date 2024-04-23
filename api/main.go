@@ -12,7 +12,7 @@ import (
 // Server serves HTTP requests for our banking service.
 type Server struct {
 	store  db.Store
-	router *gin.Engine
+	Router *gin.Engine
 }
 
 // NewServer creates a new HTTP server and set up routing.
@@ -41,12 +41,12 @@ func (server *Server) setupRouter() {
 
 	// authRoutes.POST("/transfers", server.createTransfer)
 
-	server.router = router
+	server.Router = router
 }
 
 // Start runs the HTTP server on a specific address.
 func (server *Server) Start(address string) error {
-	return server.router.Run(address)
+	return server.Router.Run(address)
 }
 
 func errorResponse(err error) gin.H {

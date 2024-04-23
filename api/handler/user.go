@@ -1,16 +1,16 @@
-package api
+package handler
 
 import (
 	"net/http"
 	"strconv"
 	"time"
 
-	presenter "github.com/cyworld8x/go-postgres-kubernetes-grpc/api/presenter"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/api/middleware"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/api/presenter"
 	db "github.com/cyworld8x/go-postgres-kubernetes-grpc/db/sqlc"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/paseto"
 	user "github.com/cyworld8x/go-postgres-kubernetes-grpc/usecase/user"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -56,8 +56,10 @@ func userLoginResponse(user db.User) loginResponse {
 
 func MakeUserHandler(router *gin.Engine, service user.UseCase) {
 	router.POST("/user", createUser(service))
-	router.GET("/user/:id", getUser(service))
 	router.POST("/login", getLogin(service))
+	pasetoMaker, _ := paseto.NewPasetoMaker()
+	authRoutes := router.Group("/").Use(middleware.AuthMiddleware(pasetoMaker))
+	authRoutes.GET("/user/:id", getUser(service))
 }
 func createUser(service user.UseCase) gin.HandlerFunc {
 	// Add your code logic here

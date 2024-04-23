@@ -1,4 +1,4 @@
-package api
+package handler_test
 
 import (
 	"bytes"
@@ -8,6 +8,8 @@ import (
 	"testing"
 	"time"
 
+	_ "github.com/cyworld8x/go-postgres-kubernetes-grpc/api"
+	servertest "github.com/cyworld8x/go-postgres-kubernetes-grpc/api/test"
 	mockdb "github.com/cyworld8x/go-postgres-kubernetes-grpc/db/mock"
 	entity "github.com/cyworld8x/go-postgres-kubernetes-grpc/db/sqlc"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
@@ -67,7 +69,7 @@ func Test_CreateUser(t *testing.T) {
 			store := mockdb.NewMockStore(ctrl)
 			tc.buildStubs(store)
 
-			server, _ := NewTestServer()
+			server, _ := servertest.NewTestServer(t)
 			recorder := httptest.NewRecorder()
 
 			// Marshal body data to JSON
@@ -78,7 +80,7 @@ func Test_CreateUser(t *testing.T) {
 			request, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(data))
 			require.NoError(t, err)
 
-			server.router.ServeHTTP(recorder, request)
+			server.Router.ServeHTTP(recorder, request)
 			tc.checkResponse(recorder)
 		})
 	}
