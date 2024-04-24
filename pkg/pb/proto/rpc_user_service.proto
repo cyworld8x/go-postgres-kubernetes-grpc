@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package pb;
+import "pkg/pb/proto/user_service.proto";
+option go_package = "./pkg/pb";
+
+service UserService {
+   rpc CreateUser(CreateUserRequest) returns (User) {};
+   rpc GetLogin(GetLoginRequest) returns (GetLoginResponse) {};
+   rpc GetUser(GetUserIdRequest) returns (User) {};
+}

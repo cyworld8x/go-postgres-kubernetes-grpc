@@ -20,7 +20,11 @@ mock:
 test: 
 	go test -v -cover ./... -coverprofile cover.out ./coverage/..
 	go tool cover -html cover.out -o ./coverage/cover.html
+proto:
+	protoc --go_out=. \
+    --go-grpc_out=. \
+    pkg/pb/proto/*.proto
 server:
 	go run main.go
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock proto
 
