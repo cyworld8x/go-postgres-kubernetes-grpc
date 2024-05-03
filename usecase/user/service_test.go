@@ -14,18 +14,19 @@ import (
 )
 
 func newFixtureUser() *entity.User {
+	user := util.GenAnUser()
 	return &entity.User{
 		ID:        util.RandomId(),
-		Username:  pgtype.Text{String: "phambchung", Valid: true},
-		Email:     pgtype.Text{String: "phambchung@gmail.com", Valid: true},
-		Password:  pgtype.Text{String: "password", Valid: true},
-		Fullname:  pgtype.Text{String: "Chung Pham", Valid: true},
-		Role:      pgtype.Text{String: "Engineer", Valid: true},
+		Username:  pgtype.Text{String: user.Login.UserName, Valid: true},
+		Email:     pgtype.Text{String: user.Email, Valid: true},
+		Password:  pgtype.Text{String: user.Login.Password, Valid: true},
+		Fullname:  pgtype.Text{String: user.Name.First + user.Name.Last, Valid: true},
+		Role:      pgtype.Text{String: "Developer", Valid: true},
 		CreatedAt: pgtype.Timestamp{Valid: true, Time: time.Now()},
 	}
 }
 
-func Test_Create(t *testing.T) {
+func TestCreate(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	store := mockdb.NewMockStore(ctrl)
