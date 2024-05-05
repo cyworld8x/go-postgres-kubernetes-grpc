@@ -18,7 +18,7 @@ mock:
 	mockgen -package mockdb -destination=db/mock/store.go github.com/cyworld8x/go-postgres-kubernetes-grpc/db/sqlc Store
 
 test: 
-	go test -v -cover ./... -coverprofile cover.out ./coverage/..
+	go test -v -cover ./...  ./.... -coverprofile cover.out ./coverage/..
 	go tool cover -html cover.out -o ./coverage/cover.html
 proto:
 	protoc --go_out=. \

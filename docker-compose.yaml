@@ -1,0 +1,29 @@
+version: "3.9"
+services:
+  postgres:
+    container_name: postgres-db
+    image: postgres:16-alpine
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=socialdb
+    ports:
+      - "20241:5432"
+    volumes:
+      - data-volume:/var/lib/postgresql/data
+  api:
+    container_name: api
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+      - "8081:8081"
+    environment:
+      - DB_SOURCE=postgresql://postgres:postgres@postgres:5432/socialdb?sslmode=disable
+    depends_on:
+      - postgres
+    entrypoint: [ "/app/wait-for.sh", "postgres:5432", "--", "/app/start.sh"]
+    command: [ "/app/main" ]
+volumes:
+  data-volume:

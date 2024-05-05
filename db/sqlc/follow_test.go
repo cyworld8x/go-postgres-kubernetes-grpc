@@ -2,6 +2,7 @@ package db
 
 import (
 	"context"
+	"log"
 	"testing"
 
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
@@ -12,13 +13,14 @@ import (
 
 func TestFollow(t *testing.T) {
 	genUser := util.GenAnUser()
-
+	pwd, _ := util.HashPassword(genUser.Login.Password)
+	log.Printf("Test Follow: username/pwd: %s %s ", genUser.Login.UserName, genUser.Login.Password)
 	userParams := CreateUserParams{
 
 		Username: pgtype.Text{String: genUser.Login.UserName, Valid: true},
 		Email:    pgtype.Text{String: genUser.Email, Valid: true},
 		Fullname: pgtype.Text{String: genUser.Name.First + " " + genUser.Name.Last, Valid: true},
-		Password: pgtype.Text{String: genUser.Login.Password, Valid: true},
+		Password: pgtype.Text{String: pwd, Valid: true},
 		Role:     pgtype.Text{String: "User", Valid: true},
 	}
 
@@ -26,13 +28,14 @@ func TestFollow(t *testing.T) {
 	require.NoError(t, errCreateUser1)
 
 	genUser = util.GenAnUser()
-
+	pwd1, _ := util.HashPassword(genUser.Login.Password)
+	log.Printf("Test Follow: username/pwd: %s %s ", genUser.Login.UserName, genUser.Login.Password)
 	userParams = CreateUserParams{
 
 		Username: pgtype.Text{String: genUser.Login.UserName, Valid: true},
 		Email:    pgtype.Text{String: genUser.Email, Valid: true},
 		Fullname: pgtype.Text{String: genUser.Name.First + " " + genUser.Name.Last, Valid: true},
-		Password: pgtype.Text{String: genUser.Login.Password, Valid: true},
+		Password: pgtype.Text{String: pwd1, Valid: true},
 		Role:     pgtype.Text{String: "User", Valid: true},
 	}
 
