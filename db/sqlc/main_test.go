@@ -19,12 +19,12 @@ func TestMain(m *testing.M) {
 	config, err := util.LoadConfiguration("../..")
 
 	if err != nil {
-		log.Fatal("can not load env configuration:", err)
+		log.Fatal().Err(err).Msg("can not load env configuration.")
 	}
 
 	conn, err := pgxpool.New(context.Background(), config.DbSource)
 	if err != nil {
-		log.Fatal("can not connect to db:", err)
+		log.Fatal().Err(err).Msg("can not connect to db.")
 	}
 
 	testStore = NewStore(conn)
