@@ -3,10 +3,11 @@ package util
 import (
 	"encoding/json"
 	"io"
-	"log"
 	"net/http"
 	"net/url"
 	"strconv"
+
+	"github.com/rs/zerolog/log"
 )
 
 type User struct {
@@ -72,7 +73,7 @@ func (c *QueryConfig) encode(u *url.URL) {
 func Generate(c *QueryConfig) ([]User, error) {
 	u, err := url.Parse(BASE_URI_RANDOM_USER_API)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("can not generate user")
 		return nil, err
 	}
 
@@ -80,21 +81,21 @@ func Generate(c *QueryConfig) ([]User, error) {
 
 	response, err := http.Get(BASE_URI_RANDOM_USER_API + "?" + u.Query().Encode())
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("can not connect to generate user API")
 		return nil, err
 	}
 	defer response.Body.Close()
 
 	rawBytes, err := io.ReadAll(response.Body)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("can not connect read response body")
 		return nil, err
 	}
 
 	var jsonRandomUser JsonRandomUser
 	err = json.Unmarshal(rawBytes, &jsonRandomUser)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal().Err(err).Msg("can not unmarshal response body")
 		return nil, err
 	}
 

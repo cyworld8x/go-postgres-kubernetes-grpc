@@ -2,9 +2,10 @@ package db
 
 import (
 	"context"
-	"log"
 	"os"
 	"testing"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
 
