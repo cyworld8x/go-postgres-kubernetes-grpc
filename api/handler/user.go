@@ -55,6 +55,7 @@ func userLoginResponse(user db.User) loginResponse {
 }
 
 func MakeUserHandler(router *gin.Engine, service user.UseCase) {
+	router.Use(middleware.GinLogger())
 	router.POST("/user", createUser(service))
 	router.POST("/login", getLogin(service))
 	pasetoMaker, _ := paseto.NewPasetoMaker()
