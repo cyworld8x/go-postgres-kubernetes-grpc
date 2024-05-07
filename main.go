@@ -36,8 +36,9 @@ func runRPCServer(config util.Configuration, store db.Store) {
 	if err != nil {
 		log.Fatal("cannot create server", err)
 	}
+	grpcLogger := grpc.UnaryInterceptor(gapi.GrpcLogger)
 
-	grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer(grpcLogger)
 	pb.RegisterUserServiceServer(grpcServer, server)
 	reflection.Register(grpcServer)
 	listener, err := net.Listen("tcp", config.GRPCServerAddress)

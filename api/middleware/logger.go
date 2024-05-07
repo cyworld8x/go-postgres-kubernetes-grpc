@@ -49,7 +49,7 @@ func GinLogger() gin.HandlerFunc {
 			Str("status_text", http.StatusText(c.Writer.Status())).
 			Dur("duration", duration).
 			Dur("body", duration).
-			Msg("request via HTTP")
+			Msg("[GIN API Server]")
 	}
 }
 
