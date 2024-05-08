@@ -6,6 +6,8 @@ dropdb:
 	docker exec -it postgres dropdb --username=postgres socialdb	
 migrateup:
 	migrate -path db/migration -database "postgresql://postgres:postgres@localhost:20241/socialdb?sslmode=disable" -verbose up
+migrateupuserdb:
+	migrate -path internal/user/infrastructure/repository/postgres/db/ -database "postgresql://postgres:postgres@localhost:20241/socialdb?sslmode=disable" -verbose up
 migratedown:
 	migrate -path db/migration -database "postgresql://postgres:postgres@localhost:20241/socialdb?sslmode=disable" -verbose down
 sqlc:
@@ -15,6 +17,8 @@ mock:
 	@go get github.com/golang/mock/gomock
 	@go install github.com/golang/mock/mockgen	
 	mockgen -source=usecase/user/interface.go -destination=usecase/user/mock/user.go -package=mock
+	mockgen -source=internal/user/usecases/users/interfaces.go -destination=internal/user/usecases/users/mock/service.go -package=mock
+	mockgen -source=internal/user/domain/interfaces.go -destination=internal/user/domain/mock/userrepository.go -package=mock
 	mockgen -package mockdb -destination=db/mock/store.go github.com/cyworld8x/go-postgres-kubernetes-grpc/db/sqlc Store
 
 test: 
@@ -26,5 +30,5 @@ proto:
     pkg/pb/proto/*.proto
 server:
 	go run main.go
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock proto
+.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock proto migrateupuserdb
 

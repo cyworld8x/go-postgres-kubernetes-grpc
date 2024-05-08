@@ -4,7 +4,7 @@ import (
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/pb"
 
 	db "github.com/cyworld8x/go-postgres-kubernetes-grpc/db/sqlc"
-	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 )
 
 // Server serves HTTP requests for our banking service.
@@ -14,7 +14,7 @@ type Server struct {
 }
 
 // NewServer creates a new gRPC server and set up routing.
-func NewServer(config util.Configuration, store db.Store) (*Server, error) {
+func NewServer(config utils.Configuration, store db.Store) (*Server, error) {
 
 	server := &Server{
 		store: store,

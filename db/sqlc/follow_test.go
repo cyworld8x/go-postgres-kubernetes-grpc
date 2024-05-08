@@ -4,17 +4,16 @@ import (
 	"context"
 	"testing"
 
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 	"github.com/rs/zerolog/log"
-
-	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
 )
 
 func TestFollow(t *testing.T) {
-	genUser := util.GenAnUser()
-	pwd, _ := util.HashPassword(genUser.Login.Password)
+	genUser := utils.GenAnUser()
+	pwd, _ := utils.HashPassword(genUser.Login.Password)
 	log.Printf("Test Follow: username/pwd: %s %s ", genUser.Login.UserName, genUser.Login.Password)
 	userParams := CreateUserParams{
 
@@ -28,8 +27,8 @@ func TestFollow(t *testing.T) {
 	user1, errCreateUser1 := testStore.CreateUser(context.Background(), userParams)
 	require.NoError(t, errCreateUser1)
 
-	genUser = util.GenAnUser()
-	pwd1, _ := util.HashPassword(genUser.Login.Password)
+	genUser = utils.GenAnUser()
+	pwd1, _ := utils.HashPassword(genUser.Login.Password)
 	log.Printf("Test Follow: username/pwd: %s %s ", genUser.Login.UserName, genUser.Login.Password)
 	userParams = CreateUserParams{
 

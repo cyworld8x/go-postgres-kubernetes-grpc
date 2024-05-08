@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/stretchr/testify/require"
@@ -12,8 +12,8 @@ import (
 
 func TestCreateUser(t *testing.T) {
 
-	genUser := util.GenAnUser()
-	pwd, err := util.HashPassword(genUser.Login.Password)
+	genUser := utils.GenAnUser()
+	pwd, err := utils.HashPassword(genUser.Login.Password)
 	require.NoError(t, err, "Should not be error in creating a Hash Password")
 	user := CreateUserParams{
 

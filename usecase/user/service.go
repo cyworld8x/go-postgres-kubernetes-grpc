@@ -4,8 +4,7 @@ import (
 	"context"
 
 	db "github.com/cyworld8x/go-postgres-kubernetes-grpc/db/sqlc"
-	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
-
+	password "github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
@@ -22,9 +21,9 @@ func NewService(r Repository) *Service {
 }
 
 // CreateUser create an user
-func (s *Service) CreateUser(username, email, fullname, password, role string) (db.User, error) {
+func (s *Service) CreateUser(username, email, fullname, pwd, role string) (db.User, error) {
 
-	pwd, err := util.HashPassword(password)
+	pwd, err := password.HashPassword(pwd)
 	if err != nil {
 		return db.User{}, err
 	}

@@ -7,7 +7,7 @@ import (
 	entity "github.com/cyworld8x/go-postgres-kubernetes-grpc/db/sqlc"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/paseto"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/pb"
-	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
+	password "github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 	"github.com/jackc/pgx/v5/pgtype"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -15,7 +15,7 @@ import (
 )
 
 func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.User, error) {
-	pwd, err := util.HashPassword(req.GetPassword())
+	pwd, err := password.HashPassword(req.GetPassword())
 	if err != nil {
 		return &pb.User{}, err
 	}
@@ -52,7 +52,7 @@ func (server *Server) GetLogin(ctx context.Context, req *pb.GetLoginRequest) (*p
 
 	}
 
-	err = util.CheckPassword(req.GetPassword(), user.Password.String)
+	err = password.CheckPassword(req.GetPassword(), user.Password.String)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "Can't login with user name and password: %v", err)
 	}

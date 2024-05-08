@@ -7,7 +7,7 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
@@ -16,7 +16,7 @@ import (
 var testStore Store
 
 func TestMain(m *testing.M) {
-	config, err := util.LoadConfiguration("../..")
+	config, err := utils.LoadConfiguration("../..")
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("can not load env configuration.")

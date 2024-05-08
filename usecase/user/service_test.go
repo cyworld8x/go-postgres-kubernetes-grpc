@@ -6,7 +6,7 @@ import (
 
 	mockdb "github.com/cyworld8x/go-postgres-kubernetes-grpc/db/mock"
 	entity "github.com/cyworld8x/go-postgres-kubernetes-grpc/db/sqlc"
-	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 	"github.com/golang/mock/gomock"
 	"github.com/jackc/pgx/v5/pgtype"
 
@@ -14,9 +14,9 @@ import (
 )
 
 func newFixtureUser() *entity.User {
-	user := util.GenAnUser()
+	user := utils.GenAnUser()
 	return &entity.User{
-		ID:        util.RandomId(),
+		ID:        utils.RandomId(),
 		Username:  pgtype.Text{String: user.Login.UserName, Valid: true},
 		Email:     pgtype.Text{String: user.Email, Valid: true},
 		Password:  pgtype.Text{String: user.Login.Password, Valid: true},

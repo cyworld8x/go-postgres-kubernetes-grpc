@@ -4,8 +4,8 @@ import (
 	handler "github.com/cyworld8x/go-postgres-kubernetes-grpc/api/handler"
 
 	db "github.com/cyworld8x/go-postgres-kubernetes-grpc/db/sqlc"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/usecase/user"
-	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -16,7 +16,7 @@ type Server struct {
 }
 
 // NewServer creates a new HTTP server and set up routing.
-func NewServer(config util.Configuration, store db.Store) (*Server, error) {
+func NewServer(config utils.Configuration, store db.Store) (*Server, error) {
 
 	server := &Server{
 		store: store,

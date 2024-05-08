@@ -9,8 +9,8 @@ import (
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/api/presenter"
 	db "github.com/cyworld8x/go-postgres-kubernetes-grpc/db/sqlc"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/paseto"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 	user "github.com/cyworld8x/go-postgres-kubernetes-grpc/usecase/user"
-	"github.com/cyworld8x/go-postgres-kubernetes-grpc/util"
 	"github.com/gin-gonic/gin"
 )
 
@@ -96,7 +96,7 @@ func getLogin(service user.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		err = util.CheckPassword(req.Password, user.Password.String)
+		err = utils.CheckPassword(req.Password, user.Password.String)
 		if err != nil {
 			ctx.JSON(http.StatusUnauthorized, "Can't login with user name and password.")
 			return
