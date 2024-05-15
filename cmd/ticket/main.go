@@ -47,11 +47,13 @@ func main() {
 	listener, err := net.Listen("tcp", config.TicketGRPCServerAddress)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot create listener: " + config.TicketGRPCServerAddress)
+		cancel()
 	}
 	log.Printf("start gRPC server on %s", config.TicketGRPCServerAddress)
 	err = server.Serve(listener)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot start gRPC server")
+		cancel()
 	}
 
 	// 	// gRPC Server.
