@@ -1,0 +1,255 @@
+basePath: /api/v1
+definitions:
+  domain.CreateEventDto:
+    properties:
+      event_name:
+        type: string
+      event_owner_id:
+        type: string
+      note:
+        type: string
+    type: object
+  domain.CreateEventSlot:
+    properties:
+      capacity:
+        type: integer
+      description:
+        type: string
+      end_time:
+        type: string
+      event_id:
+        type: string
+      price:
+        type: number
+      slot_name:
+        type: string
+      start_time:
+        type: string
+    type: object
+  domain.Event:
+    properties:
+      created:
+        type: string
+      event_name:
+        type: string
+      event_owner_id:
+        type: string
+      id:
+        type: string
+      note:
+        type: string
+      revenue:
+        type: number
+      status:
+        type: string
+      total_sold_tickets:
+        type: integer
+      updated:
+        type: string
+    type: object
+  domain.EventSlot:
+    properties:
+      capacity:
+        type: integer
+      created:
+        type: string
+      description:
+        type: string
+      end_time:
+        type: string
+      event_id:
+        type: string
+      event_name:
+        type: string
+      id:
+        type: string
+      price:
+        type: number
+      slot_name:
+        type: string
+      start_time:
+        type: string
+      status:
+        type: string
+      updated:
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a Event API server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Event API
+  version: "1.0"
+paths:
+  /event:
+    post:
+      consumes:
+      - application/json
+      description: Create event
+      parameters:
+      - description: Event Info
+        in: body
+        name: arg
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateEventDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Event'
+        "400":
+          description: Bad Request
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Create event
+      tags:
+      - event
+  /event/:id/slots:
+    get:
+      consumes:
+      - application/json
+      description: get slot of an event by event Id
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/domain.EventSlot'
+            type: array
+        "400":
+          description: Bad Request
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: get slots of an event
+      tags:
+      - event
+  /event/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get event by Id
+      parameters:
+      - description: Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Event'
+        "400":
+          description: Bad Request
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: get an event
+      tags:
+      - event
+  /event/slot:
+    post:
+      consumes:
+      - application/json
+      description: Create slots for an event
+      parameters:
+      - description: Event ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Event Slot Info
+        in: body
+        name: arg
+        required: true
+        schema:
+          $ref: '#/definitions/domain.CreateEventSlot'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.EventSlot'
+        "400":
+          description: Bad Request
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Create slots for an event
+      tags:
+      - event
+  /event/slot/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get slot event by Id
+      parameters:
+      - description: ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.EventSlot'
+        "400":
+          description: Bad Request
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: get slots of en event
+      tags:
+      - event
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

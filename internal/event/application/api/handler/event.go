@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func MakeEventHandler(router *gin.Engine, uc events.UseCase) {
+func MakeEventHandler(router gin.IRouter, uc events.UseCase) {
 	router.Use(middleware.GinLogger())
 	router.POST("/event", CreateEvent(uc))
 	router.GET("/event/:id", GetEvent(uc))
@@ -26,6 +26,18 @@ func MakeEventHandler(router *gin.Engine, uc events.UseCase) {
 	// authRoutes.GET("/user/:id", getUser(service))
 }
 
+// Get Event godoc
+// @Summary      Create event
+// @Description  Create event
+// @Tags         event
+// @Accept       json
+// @Produce      json
+// @Param        arg  body domain.CreateEventDto true "Event Info"
+// @Success      200  {object}  domain.Event
+// @Failure      400  {object}  error
+// @Failure      404  {object}  error
+// @Failure      500  {object}  error
+// @Router       /event [Post]
 func CreateEvent(usecase events.UseCase) gin.HandlerFunc {
 	return gin.HandlerFunc(func(ctx *gin.Context) {
 		var req domain.CreateEventDto
@@ -44,6 +56,18 @@ func CreateEvent(usecase events.UseCase) gin.HandlerFunc {
 	})
 }
 
+// Get Event godoc
+// @Summary      get an event
+// @Description  get event by Id
+// @Tags         event
+// @Accept       json
+// @Produce      json
+// @Param        id   path string  true "Id"
+// @Success      200  {object}  domain.Event
+// @Failure      400  {object}  error
+// @Failure      404  {object}  error
+// @Failure      500  {object}  error
+// @Router       /event/{id} [get]
 func GetEvent(usecase events.UseCase) gin.HandlerFunc {
 	return gin.HandlerFunc(func(ctx *gin.Context) {
 		id, err := uuid.Parse(ctx.Param("id"))
@@ -61,6 +85,19 @@ func GetEvent(usecase events.UseCase) gin.HandlerFunc {
 	})
 }
 
+// Get Event godoc
+// @Summary      Create slots for an event
+// @Description  Create slots for an event
+// @Tags         event
+// @Accept       json
+// @Produce      json
+// @Param        id   path string  true "Event ID"
+// @Param        arg  body domain.CreateEventSlot true "Event Slot Info"
+// @Success      200  {object}  domain.EventSlot
+// @Failure      400  {object}  error
+// @Failure      404  {object}  error
+// @Failure      500  {object}  error
+// @Router       /event/slot [Post]
 func OpenEventSlots(usecase events.UseCase) gin.HandlerFunc {
 	return gin.HandlerFunc(func(ctx *gin.Context) {
 		var req domain.CreateEventSlot
@@ -78,6 +115,18 @@ func OpenEventSlots(usecase events.UseCase) gin.HandlerFunc {
 	})
 }
 
+// Get Event godoc
+// @Summary      get slots of an event
+// @Description  get slot of an event by event Id
+// @Tags         event
+// @Accept       json
+// @Produce      json
+// @Param        id   path string  true "ID"
+// @Success      200  {object}  []domain.EventSlot
+// @Failure      400  {object}  error
+// @Failure      404  {object}  error
+// @Failure      500  {object}  error
+// @Router       /event/:id/slots [get]
 func GetEventSlotsById(usecase events.UseCase) gin.HandlerFunc {
 	return gin.HandlerFunc(func(ctx *gin.Context) {
 		id, err := uuid.Parse(ctx.Param("id"))
@@ -95,6 +144,18 @@ func GetEventSlotsById(usecase events.UseCase) gin.HandlerFunc {
 	})
 }
 
+// Get Event godoc
+// @Summary      get slots of en event
+// @Description  get slot event by Id
+// @Tags         event
+// @Accept       json
+// @Produce      json
+// @Param        id   path string  true "ID"
+// @Success      200  {object}  domain.EventSlot
+// @Failure      400  {object}  error
+// @Failure      404  {object}  error
+// @Failure      500  {object}  error
+// @Router       /event/slot/{id} [get]
 func GetEventSlotsByEventId(usecase events.UseCase) gin.HandlerFunc {
 	return gin.HandlerFunc(func(ctx *gin.Context) {
 		id, err := uuid.Parse(ctx.Param("id"))

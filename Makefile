@@ -6,6 +6,10 @@ createdb:
 	docker exec -it postgres createdb --username=postgres --owner=postgres socialdb
 dropdb:
 	docker exec -it postgres dropdb --username=postgres socialdb	
+swagger:
+	docker run --rm -v $(pwd):/code ghcr.io/swaggo/swag:latest
+swagger-gen-api:
+	swag init -g internal/event/application/api/server.go  -o internal/event/application/api/swagger/docs/
 migrateup:
 	migrate -path misc/db/postgres/migration -database "postgresql://postgres:postgres@localhost:20241/socialdb?sslmode=disable" -verbose up
 migratedown:

@@ -123,7 +123,8 @@ func (s *service) GetEventSlotsById(ctx context.Context, id uuid.UUID) (*domain.
 	if err != nil {
 		return nil, err
 	}
-	return &domain.EventSlot{
+
+	eventSlotDto := &domain.EventSlot{
 		ID:          eventSlot.ID,
 		SlotName:    eventSlot.SlotName,
 		Description: eventSlot.Description,
@@ -135,7 +136,16 @@ func (s *service) GetEventSlotsById(ctx context.Context, id uuid.UUID) (*domain.
 		EventID:     eventSlot.EventID,
 		Created:     eventSlot.Created.Time,
 		Updated:     eventSlot.Updated.Time,
-	}, nil
+	}
+
+	event, err := s.repo.GetEvent(ctx, eventSlot.EventID)
+	if err != nil {
+		log.Error().Err(err).Msg("cannot get event")
+		return eventSlotDto, err
+	}
+
+	eventSlotDto.EventName = event.EventName
+	return eventSlotDto, nil
 
 }
 
