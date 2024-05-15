@@ -35,7 +35,7 @@ message CheckinTicketRequest {
 
 message CheckinTicketResponse {
     bool valid = 1;
-    Ticket Ticket = 2;
+    Ticket ticket = 2;
 }
 
 message Ticket {

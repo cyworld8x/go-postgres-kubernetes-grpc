@@ -12,6 +12,7 @@ import (
 )
 
 type Querier interface {
+	CheckIn(ctx context.Context, code string) (UserTicket, error)
 	GetTicketsByEventSlotId(ctx context.Context, eventSlotID uuid.UUID) ([]UserTicket, error)
 	GetTicketsByUserId(ctx context.Context, buyerID pgtype.UUID) ([]UserTicket, error)
 	GetTotalTicketByEventSlot(ctx context.Context, eventSlotID uuid.UUID) (int64, error)

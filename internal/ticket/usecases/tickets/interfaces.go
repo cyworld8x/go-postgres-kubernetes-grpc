@@ -13,5 +13,6 @@ type UseCase interface {
 	GetTicketsByEventSlotId(ctx context.Context, eventSlotID uuid.UUID) ([]domain.UserTicket, error)
 	GetTicketsByUserId(ctx context.Context, buyerID uuid.UUID) ([]domain.UserTicket, error)
 	SellTicket(ctx context.Context, eventSlotID uuid.UUID, buyerID uuid.UUID) (domain.UserTicket, error)
+	CheckIn(ctx context.Context, code string) (domain.UserTicket, error)
 	GetTotalTicketByEventSlot(ctx context.Context, eventSlotID uuid.UUID) (int64, error)
 }

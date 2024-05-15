@@ -56,9 +56,22 @@ func (server *Server) SellTicket(ctx context.Context, req *pb.SellTicketRequest)
 		EventSlotId: ticket.EventSlotID.String(),
 		Status:      ticket.Status,
 		Issued:      ticket.Issued.String(),
-		BuyerId:     buyerId.String(),
+		BuyerId:     ticket.BuyerID.String(),
 	}, nil
 }
-func (server *Server) CheckIn(context.Context, *pb.CheckinTicketRequest) (*pb.CheckinTicketResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckIn not implemented")
+func (server *Server) CheckIn(ctx context.Context, req *pb.CheckinTicketRequest) (*pb.CheckinTicketResponse, error) {
+
+	ticket, err := server.uc.CheckIn(ctx, req.Code)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "cannot check in: %v", err)
+	}
+	return &pb.CheckinTicketResponse{
+		Valid: true,
+		Ticket: &pb.Ticket{
+			Code:    ticket.Code,
+			Price:   ticket.Price,
+			Status:  ticket.Status,
+			BuyerId: ticket.BuyerID.String(),
+		},
+	}, nil
 }

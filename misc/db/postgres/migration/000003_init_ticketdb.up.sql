@@ -2,7 +2,7 @@ CREATE SCHEMA "user";
 
 
 
-CREATE TYPE ticket_status AS ENUM ('New', 'Booked', 'InStock');
+CREATE TYPE ticket_status AS ENUM ('New', 'Booked', 'CheckedIn' , 'InStock');
 
 CREATE TABLE "user"."tickets" (
   "id" uuid NOT NULL DEFAULT (uuid_generate_v4()),

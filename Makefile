@@ -31,10 +31,12 @@ server:
 	go run main.go
 
 rebuild-db: dropdb createdb migrateup
+
+rebuild: sqlc proto 
+
 run-ticket:
 	go run cmd/ticket/main.go
 run-user:
 	go run cmd/user/main.go
-build: migrateup server 
-.PHONY: postgres stoppostgres createdb dropdb migrateup migratedown sqlc test server mock proto migrateupuserdb rebuild-db build run-ticket run-user
+.PHONY: postgres stoppostgres createdb dropdb migrateup migratedown sqlc test server mock proto migrateupuserdb rebuild-db rebuild run-ticket run-user
 

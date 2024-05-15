@@ -15,9 +15,10 @@ import (
 type TicketStatus string
 
 const (
-	TicketStatusNew     TicketStatus = "New"
-	TicketStatusBooked  TicketStatus = "Booked"
-	TicketStatusInStock TicketStatus = "InStock"
+	TicketStatusNew       TicketStatus = "New"
+	TicketStatusBooked    TicketStatus = "Booked"
+	TicketStatusCheckedIn TicketStatus = "CheckedIn"
+	TicketStatusInStock   TicketStatus = "InStock"
 )
 
 func (e *TicketStatus) Scan(src interface{}) error {

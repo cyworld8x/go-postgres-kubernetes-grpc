@@ -7,6 +7,7 @@ import (
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/ticket/domain"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/ticket/infrastructure/repository"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/ticket/infrastructure/repository/postgres"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 	_ "github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -98,10 +99,37 @@ func (s *service) SellTicket(ctx context.Context, eventSlotID uuid.UUID, buyerID
 	if err != nil {
 		return domain.UserTicket{}, err
 	}
+	buyerid := utils.PgGuid{
+		Bytes: ticket.BuyerID.Bytes,
+	}
+
 	return domain.UserTicket{
 		ID:          ticket.ID,
 		Code:        ticket.Code,
 		EventSlotID: ticket.EventSlotID,
+		Status:      string(ticket.Status),
+		BuyerID:     buyerid.ToUUID(),
+		Price:       ticket.Price,
+		Issued:      ticket.Issued.Time,
+	}, nil
+}
+
+// CheckIn implements UseCase.
+func (s *service) CheckIn(ctx context.Context, code string) (domain.UserTicket, error) {
+	ticket, err := s.repo.CheckIn(ctx, code)
+	if err != nil {
+		return domain.UserTicket{}, err
+	}
+
+	buyer := utils.PgGuid{
+		Bytes: ticket.BuyerID.Bytes,
+	}
+
+	return domain.UserTicket{
+		ID:          ticket.ID,
+		Code:        ticket.Code,
+		EventSlotID: ticket.EventSlotID,
+		BuyerID:     buyer.ToUUID(),
 		Status:      string(ticket.Status),
 		Price:       ticket.Price,
 		Issued:      ticket.Issued.Time,

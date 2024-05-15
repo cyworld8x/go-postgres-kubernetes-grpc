@@ -19,6 +19,12 @@ WHERE ( id, code, $2) in (
 )  
 RETURNING *;
 
+-- name: CheckIn :one
+UPDATE "user".tickets as t
+SET STATUS = 'CheckedIn'
+WHERE code = $1
+RETURNING *;
+
 -- name: GetTotalTicketByEventSlot :one
 SELECT COUNT(*) FROM "user"."tickets"
 WHERE event_slot_id = $1;

@@ -12,6 +12,28 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const CheckIn = `-- name: CheckIn :one
+UPDATE "user".tickets as t
+SET STATUS = 'CheckedIn'
+WHERE code = $1
+RETURNING id, code, event_slot_id, status, price, issued, buyer_id
+`
+
+func (q *Queries) CheckIn(ctx context.Context, code string) (UserTicket, error) {
+	row := q.db.QueryRow(ctx, CheckIn, code)
+	var i UserTicket
+	err := row.Scan(
+		&i.ID,
+		&i.Code,
+		&i.EventSlotID,
+		&i.Status,
+		&i.Price,
+		&i.Issued,
+		&i.BuyerID,
+	)
+	return i, err
+}
+
 const GetTicketsByEventSlotId = `-- name: GetTicketsByEventSlotId :many
 SELECT id, code, event_slot_id, status, price, issued, buyer_id FROM "user"."tickets"
 WHERE event_slot_id = $1 
