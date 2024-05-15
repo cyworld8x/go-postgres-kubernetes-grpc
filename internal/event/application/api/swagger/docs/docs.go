@@ -119,7 +119,7 @@ const docTemplate = `{
         },
         "/event/slot": {
             "post": {
-                "description": "Create slots for an event",
+                "description": "create slot for an event",
                 "consumes": [
                     "application/json"
                 ],
@@ -172,7 +172,7 @@ const docTemplate = `{
         },
         "/event/slot/{id}": {
             "get": {
-                "description": "get slot event by Id",
+                "description": "get slot event by event Id",
                 "consumes": [
                     "application/json"
                 ],
@@ -182,11 +182,11 @@ const docTemplate = `{
                 "tags": [
                     "event"
                 ],
-                "summary": "get slots of en event",
+                "summary": "get slots of an event",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "ID",
+                        "description": "id",
                         "name": "id",
                         "in": "path",
                         "required": true

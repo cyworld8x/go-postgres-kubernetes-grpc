@@ -87,7 +87,7 @@ func GetEvent(usecase events.UseCase) gin.HandlerFunc {
 
 // Get Event godoc
 // @Summary      Create slots for an event
-// @Description  Create slots for an event
+// @Description  create slot for an event
 // @Tags         event
 // @Accept       json
 // @Produce      json
@@ -145,12 +145,12 @@ func GetEventSlotsById(usecase events.UseCase) gin.HandlerFunc {
 }
 
 // Get Event godoc
-// @Summary      get slots of en event
-// @Description  get slot event by Id
+// @Summary      get slots of an event
+// @Description  get slot event by event Id
 // @Tags         event
 // @Accept       json
 // @Produce      json
-// @Param        id   path string  true "ID"
+// @Param        id   path string  true "id"
 // @Success      200  {object}  domain.EventSlot
 // @Failure      400  {object}  error
 // @Failure      404  {object}  error

@@ -187,7 +187,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Create slots for an event
+      description: create slot for an event
       parameters:
       - description: Event ID
         in: path
@@ -223,9 +223,9 @@ paths:
     get:
       consumes:
       - application/json
-      description: get slot event by Id
+      description: get slot event by event Id
       parameters:
-      - description: ID
+      - description: id
         in: path
         name: id
         required: true
@@ -246,7 +246,7 @@ paths:
         "500":
           description: Internal Server Error
           schema: {}
-      summary: get slots of en event
+      summary: get slots of an event
       tags:
       - event
 securityDefinitions:
