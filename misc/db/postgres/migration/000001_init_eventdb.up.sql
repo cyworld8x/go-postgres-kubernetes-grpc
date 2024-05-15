@@ -1,27 +1,36 @@
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+CREATE TYPE event_status AS ENUM ('Planned', 'Open', 'Closed', 'Cancelled');
+
+CREATE TYPE event_slot_status AS ENUM ('New', 'Closed', 'Cancelled');
+
+
 CREATE TABLE "events" (
   "id" uuid NOT NULL DEFAULT (uuid_generate_v4()),
   "event_name" varchar(200) NOT NULL,
+  "note" varchar(200) NOT NULL,
+  "revenue" real NOT NULL DEFAULT (0.0),
+  "status" event_status NOT NULL DEFAULT 'Planned',
+  "total_sold_tickets" integer NOT NULL DEFAULT 0,
   "event_owner_id" uuid NOT NULL,
   "created" timestamp NOT NULL DEFAULT (now()),
-  "updated" timestamp,
+  "updated" timestamp NOT NULL DEFAULT (now()),
   PRIMARY KEY ("id")
 );
 
 CREATE TABLE "event_slots" (
   "id" uuid NOT NULL DEFAULT (uuid_generate_v4()),
-  "item_type" integer NOT NULL,
   "slot_name" varchar(200) NOT NULL,
   "description" text NOT NULL,
-  "price" money NOT NULL,
+  "price" real NOT NULL,
   "capacity" integer NOT NULL,
-  "status" integer NOT NULL,
+  "status" event_slot_status NOT NULL DEFAULT 'New',
   "start_time" timestamp NOT NULL,
   "end_time" timestamp NOT NULL,
   "event_id" uuid NOT NULL,
   "created" timestamp NOT NULL DEFAULT (now()),
-  "updated" timestamp,
+  "updated" timestamp NOT NULL DEFAULT (now()),
   PRIMARY KEY ("id")
 );
 

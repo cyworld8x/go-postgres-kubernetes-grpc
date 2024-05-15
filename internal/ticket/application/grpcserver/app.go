@@ -19,8 +19,8 @@ type App struct {
 
 func New(
 	// cfg *config.Config,
-	uc tickets.UseCase,
 	gRPCServer pb.TicketServiceServer,
+	uc tickets.UseCase,
 ) *App {
 	return &App{
 		// Cfg:               cfg,
@@ -38,7 +38,7 @@ func Init(
 	repository := repository.NewRepository(connPool)
 	uc := tickets.NewService(repository)
 	server := NewServer(grpcServer, uc)
-	app := New(uc, server)
+	app := New(server, uc)
 
 	return app, nil
 

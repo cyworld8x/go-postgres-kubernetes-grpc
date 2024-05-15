@@ -36,6 +36,8 @@ rebuild: sqlc proto
 
 run-ticket:
 	go run cmd/ticket/main.go
+run-event-api:
+	go run cmd/event/main.go
 run-user:
 	go run cmd/user/main.go
 .PHONY: postgres stoppostgres createdb dropdb migrateup migratedown sqlc test server mock proto migrateupuserdb rebuild-db rebuild run-ticket run-user
