@@ -1,5 +1,4 @@
 CREATE SCHEMA "db" ;
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE TABLE "db"."users" (
   "id" uuid NOT NULL DEFAULT (uuid_generate_v4()),
   "code" varchar(100) NOT NULL,

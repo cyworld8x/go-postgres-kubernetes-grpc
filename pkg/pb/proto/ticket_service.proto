@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package pb;
+import "google/protobuf/timestamp.proto";
+option go_package = "./pkg/pb";
+
+message CreateTicketsRequest {
+    string event_slot_id = 1;
+    float price = 2;
+    int64 capacity = 3;
+}
+
+message CreateTicketsResponse {
+    string event_slot_id = 1;
+    int64 issued = 2;
+    int64 total = 3;
+}
+
+message SellTicketRequest {
+    string buyer_id = 1;
+    string event_slot_id = 2;
+}
+
+message SellTicketResponse {
+    string code = 1;
+    string event_slot_id = 2;
+    string status = 3;
+    string issued = 4;
+    string buyer_id = 5;
+}
+
+message CheckinTicketRequest {
+    string code = 1;
+}
+
+message CheckinTicketResponse {
+    bool valid = 1;
+    Ticket Ticket = 2;
+}
+
+message Ticket {
+    string code = 1;
+    string event_name = 2;
+    string event_slot = 3;
+    string buyer_id = 4;    
+    string buyer_name = 5; 
+    string status = 6;
+    float price = 7;
+    google.protobuf.Timestamp start_time = 8;
+    google.protobuf.Timestamp end_time = 9;
+}

@@ -1,18 +1,17 @@
 postgres:
 	docker run --name postgres -p 20241:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -d postgres:16-alpine
+stoppostgres:
+	docker rm postgres
 createdb:
 	docker exec -it postgres createdb --username=postgres --owner=postgres socialdb
 dropdb:
 	docker exec -it postgres dropdb --username=postgres socialdb	
 migrateup:
-	migrate -path db/migration -database "postgresql://postgres:postgres@localhost:20241/socialdb?sslmode=disable" -verbose up
-migrateupuserdb:
-	migrate -path internal/user/infrastructure/repository/postgres/db/ -database "postgresql://postgres:postgres@localhost:20241/socialdb?sslmode=disable" -verbose up
+	migrate -path misc/db/postgres/migration -database "postgresql://postgres:postgres@localhost:20241/socialdb?sslmode=disable" -verbose up
 migratedown:
-	migrate -path db/migration -database "postgresql://postgres:postgres@localhost:20241/socialdb?sslmode=disable" -verbose down
+	migrate -path misc/db/postgres/migration -database "postgresql://postgres:postgres@localhost:20241/socialdb?sslmode=disable" -verbose down
 sqlc:
 	sqlc generate
-
 mock:
 	@go get github.com/golang/mock/gomock
 	@go install github.com/golang/mock/mockgen	
@@ -30,5 +29,12 @@ proto:
     pkg/pb/proto/*.proto
 server:
 	go run main.go
-.PHONY: postgres createdb dropdb migrateup migratedown sqlc test server mock proto migrateupuserdb
+
+rebuild-db: dropdb createdb migrateup
+run-ticket:
+	go run cmd/ticket/main.go
+run-user:
+	go run cmd/user/main.go
+build: migrateup server 
+.PHONY: postgres stoppostgres createdb dropdb migrateup migratedown sqlc test server mock proto migrateupuserdb rebuild-db build run-ticket run-user
 

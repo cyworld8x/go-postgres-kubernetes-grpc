@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS "db".users;
+DROP SCHEMA IF EXISTS "db"

@@ -1,0 +1,2 @@
+DROP TABLE IF EXISTS "user".tickets;
+DROP SCHEMA IF EXISTS "user"

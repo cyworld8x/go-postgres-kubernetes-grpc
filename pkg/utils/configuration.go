@@ -3,10 +3,11 @@ package utils
 import "github.com/spf13/viper"
 
 type Configuration struct {
-	DbDriver          string `mapstructure:"DB_DRIVER"`
-	DbSource          string `mapstructure:"DB_SOURCE"`
-	HTTPServerAddress string `mapstructure:"HTTP_SERVER_ADDRESS"`
-	GRPCServerAddress string `mapstructure:"GRPC_SERVER_ADDRESS"`
+	DbDriver                string `mapstructure:"DB_DRIVER"`
+	DbSource                string `mapstructure:"DB_SOURCE"`
+	HTTPServerAddress       string `mapstructure:"HTTP_SERVER_ADDRESS"`
+	GRPCServerAddress       string `mapstructure:"GRPC_SERVER_ADDRESS"`
+	TicketGRPCServerAddress string `mapstructure:"TICKET_GRPC_SERVER_ADDRESS"`
 }
 
 // Configuration readling configuration from file

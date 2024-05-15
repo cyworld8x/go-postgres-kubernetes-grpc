@@ -7,6 +7,8 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=socialdb
+    healthcheck:
+      test: ["CMD", "pg_isready"]
     ports:
       - "20241:5432"
     volumes:
@@ -19,6 +21,7 @@ services:
     ports:
       - "8080:8080"
       - "8081:8081"
+      - "8082:8082"
     environment:
       - DB_SOURCE=postgresql://postgres:postgres@postgres:5432/socialdb?sslmode=disable
     depends_on:

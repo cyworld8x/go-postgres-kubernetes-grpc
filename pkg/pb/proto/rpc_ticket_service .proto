@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package pb;
+import "pkg/pb/proto/ticket_service.proto";
+option go_package = "./pkg/pb";
+
+service TicketService {
+   rpc CreateTickets(CreateTicketsRequest) returns (CreateTicketsResponse) {};
+   rpc SellTicket(SellTicketRequest) returns (SellTicketResponse) {};
+   rpc CheckIn(CheckinTicketRequest) returns (CheckinTicketResponse) {};
+}
