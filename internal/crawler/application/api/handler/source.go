@@ -118,7 +118,7 @@ func GetSources(usecase sources.UseCase) gin.HandlerFunc {
 // @Failure      400  {object}  error
 // @Failure      404  {object}  error
 // @Failure      500  {object}  error
-// @Router       /sources [Post]
+// @Router       /sources [Put]
 func UpdateSource(usecase sources.UseCase) gin.HandlerFunc {
 	return gin.HandlerFunc(func(ctx *gin.Context) {
 		var req domain.Source

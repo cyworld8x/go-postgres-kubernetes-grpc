@@ -58,6 +58,50 @@ const docTemplate = `{
                     }
                 }
             },
+            "put": {
+                "description": "Create Source",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Source"
+                ],
+                "summary": "Create Source",
+                "parameters": [
+                    {
+                        "description": "Source Info",
+                        "name": "arg",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.Source"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Source"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            },
             "post": {
                 "description": "Create Source",
                 "consumes": [

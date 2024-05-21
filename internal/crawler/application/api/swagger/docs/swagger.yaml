@@ -127,6 +127,36 @@ paths:
       summary: Create Source
       tags:
       - Source
+    put:
+      consumes:
+      - application/json
+      description: Create Source
+      parameters:
+      - description: Source Info
+        in: body
+        name: arg
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Source'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Source'
+        "400":
+          description: Bad Request
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Create Source
+      tags:
+      - Source
   /sources/{id}:
     get:
       consumes:

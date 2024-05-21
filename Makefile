@@ -9,8 +9,8 @@ dropdb:
 swagger:
 	docker run --rm -v $(pwd):/code ghcr.io/swaggo/swag:latest
 swagger-gen-api:
-	swag init -g internal/event/application/api/server.go  -o internal/event/application/api/swagger/docs/
-	swag init -g internal/crawler/application/api/server.go  -o internal/crawler/application/api/swagger/docs/
+	swag init -d internal/event/application/api/,internal/event/domain/  -g server.go  -o internal/event/application/api/swagger/docs/
+	swag init -d internal/crawler/application/api/,internal/crawler/domain/  -g server.go  -o internal/crawler/application/api/swagger/docs/
 migrateup:
 	migrate -path misc/db/postgres/migration -database "postgresql://postgres:postgres@localhost:20241/socialdb?sslmode=disable" -verbose up
 migratedown:
