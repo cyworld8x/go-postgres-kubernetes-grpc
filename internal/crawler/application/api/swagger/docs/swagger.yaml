@@ -1,0 +1,163 @@
+basePath: /api/v1
+definitions:
+  domain.Page:
+    properties:
+      page_events:
+        items:
+          $ref: '#/definitions/domain.PageEvent'
+        type: array
+      url:
+        type: string
+    type: object
+  domain.PageEvent:
+    properties:
+      enter_value:
+        type: string
+      order:
+        type: integer
+      parsed_objects:
+        items:
+          $ref: '#/definitions/domain.PageObject'
+        type: array
+      selector:
+        type: string
+      time_sleep:
+        type: integer
+      type:
+        type: string
+    type: object
+  domain.PageObject:
+    properties:
+      key:
+        type: string
+      objects:
+        items:
+          $ref: '#/definitions/domain.PageObject'
+        type: array
+      regex_extract:
+        type: string
+      selector:
+        type: string
+    type: object
+  domain.Source:
+    properties:
+      data:
+        $ref: '#/definitions/domain.WebSite'
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  domain.WebSite:
+    properties:
+      pages:
+        items:
+          $ref: '#/definitions/domain.Page'
+        type: array
+      url:
+        type: string
+    type: object
+externalDocs:
+  description: OpenAPI
+  url: https://swagger.io/resources/open-api/
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a Crawler API server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger Crawler API
+  version: "1.0"
+paths:
+  /sources:
+    get:
+      consumes:
+      - application/json
+      description: get source by Id
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Source'
+        "400":
+          description: Bad Request
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: get sources
+      tags:
+      - Source
+    post:
+      consumes:
+      - application/json
+      description: Create Source
+      parameters:
+      - description: Source Info
+        in: body
+        name: arg
+        required: true
+        schema:
+          $ref: '#/definitions/domain.Source'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Source'
+        "400":
+          description: Bad Request
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Create Source
+      tags:
+      - Source
+  /sources/{id}:
+    get:
+      consumes:
+      - application/json
+      description: get source by Id
+      parameters:
+      - description: Id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Source'
+        "400":
+          description: Bad Request
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: get an source
+      tags:
+      - Source
+securityDefinitions:
+  BasicAuth:
+    type: basic
+swagger: "2.0"

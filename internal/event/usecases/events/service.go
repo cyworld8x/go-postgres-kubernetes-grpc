@@ -182,6 +182,7 @@ func (s *service) OpenEventSlots(ctx context.Context, arg *domain.CreateEventSlo
 func (s *service) StartEvent(ctx context.Context, id uuid.UUID) (bool, error) {
 	eventSlot, err := s.repo.StartEvent(ctx, id)
 	if err != nil && eventSlot.Status != "Open" {
+		log.Error().Err(err).Msg("cannot update event")
 		return false, err
 	}
 	return true, nil
@@ -191,6 +192,7 @@ func (s *service) StartEvent(ctx context.Context, id uuid.UUID) (bool, error) {
 func (s *service) UpdateEventSlots(ctx context.Context, id uuid.UUID, slotName string) (*domain.EventSlot, error) {
 	eventSlot, err := s.repo.UpdateEventSlots(ctx, postgres.UpdateEventSlotsParams{SlotName: slotName, ID: id})
 	if err != nil {
+		log.Error().Err(err).Msg("cannot update event slot")
 		return nil, err
 	}
 	return &domain.EventSlot{

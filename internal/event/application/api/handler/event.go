@@ -12,11 +12,11 @@ import (
 
 func MakeEventHandler(router gin.IRouter, uc events.UseCase) {
 	router.Use(middleware.GinLogger())
-	router.POST("/event", CreateEvent(uc))
-	router.GET("/event/:id", GetEvent(uc))
-	router.POST("/event/slot", OpenEventSlots(uc))
-	router.GET("/event/slot/:id", GetEventSlotsById(uc))
-	router.GET("/event/:id/slots", GetEventSlotsByEventId(uc))
+	router.POST("/events", CreateEvent(uc))
+	router.GET("/events/:id", GetEvent(uc))
+	router.POST("/events/slot", OpenEventSlots(uc))
+	router.GET("/events/slot/:id", GetEventSlotsById(uc))
+	router.GET("/events/:id/slots", GetEventSlotsByEventId(uc))
 	// router.POST("/login", getLogin(service))
 	// router.Use(middleware.GinLogger())
 	// router.POST("/user", createUser(service))
@@ -37,7 +37,7 @@ func MakeEventHandler(router gin.IRouter, uc events.UseCase) {
 // @Failure      400  {object}  error
 // @Failure      404  {object}  error
 // @Failure      500  {object}  error
-// @Router       /event [Post]
+// @Router       /events [Post]
 func CreateEvent(usecase events.UseCase) gin.HandlerFunc {
 	return gin.HandlerFunc(func(ctx *gin.Context) {
 		var req domain.CreateEventDto
@@ -67,7 +67,7 @@ func CreateEvent(usecase events.UseCase) gin.HandlerFunc {
 // @Failure      400  {object}  error
 // @Failure      404  {object}  error
 // @Failure      500  {object}  error
-// @Router       /event/{id} [get]
+// @Router       /events/{id} [get]
 func GetEvent(usecase events.UseCase) gin.HandlerFunc {
 	return gin.HandlerFunc(func(ctx *gin.Context) {
 		id, err := uuid.Parse(ctx.Param("id"))
@@ -75,10 +75,10 @@ func GetEvent(usecase events.UseCase) gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, err)
 			return
 		}
-		event, errCreate := usecase.GetEvent(ctx, id)
+		event, errGet := usecase.GetEvent(ctx, id)
 
-		if errCreate != nil {
-			ctx.JSON(http.StatusInternalServerError, errCreate)
+		if errGet != nil {
+			ctx.JSON(http.StatusInternalServerError, errGet)
 		}
 
 		ctx.JSON(http.StatusOK, event)
@@ -97,7 +97,7 @@ func GetEvent(usecase events.UseCase) gin.HandlerFunc {
 // @Failure      400  {object}  error
 // @Failure      404  {object}  error
 // @Failure      500  {object}  error
-// @Router       /event/slot [Post]
+// @Router       /events/slot [Post]
 func OpenEventSlots(usecase events.UseCase) gin.HandlerFunc {
 	return gin.HandlerFunc(func(ctx *gin.Context) {
 		var req domain.CreateEventSlot
@@ -126,7 +126,7 @@ func OpenEventSlots(usecase events.UseCase) gin.HandlerFunc {
 // @Failure      400  {object}  error
 // @Failure      404  {object}  error
 // @Failure      500  {object}  error
-// @Router       /event/:id/slots [get]
+// @Router       /events/:id/slots [get]
 func GetEventSlotsById(usecase events.UseCase) gin.HandlerFunc {
 	return gin.HandlerFunc(func(ctx *gin.Context) {
 		id, err := uuid.Parse(ctx.Param("id"))
@@ -134,10 +134,10 @@ func GetEventSlotsById(usecase events.UseCase) gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, err)
 			return
 		}
-		eventSlot, errCreate := usecase.GetEventSlotsById(ctx, id)
+		eventSlot, errGet := usecase.GetEventSlotsById(ctx, id)
 
-		if errCreate != nil {
-			ctx.JSON(http.StatusInternalServerError, errCreate)
+		if errGet != nil {
+			ctx.JSON(http.StatusInternalServerError, errGet)
 		}
 
 		ctx.JSON(http.StatusOK, eventSlot)
@@ -155,7 +155,7 @@ func GetEventSlotsById(usecase events.UseCase) gin.HandlerFunc {
 // @Failure      400  {object}  error
 // @Failure      404  {object}  error
 // @Failure      500  {object}  error
-// @Router       /event/slot/{id} [get]
+// @Router       /events/slot/{id} [get]
 func GetEventSlotsByEventId(usecase events.UseCase) gin.HandlerFunc {
 	return gin.HandlerFunc(func(ctx *gin.Context) {
 		id, err := uuid.Parse(ctx.Param("id"))
@@ -163,10 +163,10 @@ func GetEventSlotsByEventId(usecase events.UseCase) gin.HandlerFunc {
 			ctx.JSON(http.StatusBadRequest, err)
 			return
 		}
-		eventSlots, errCreate := usecase.GetEventSlotsByEventId(ctx, id)
+		eventSlots, errGet := usecase.GetEventSlotsByEventId(ctx, id)
 
-		if errCreate != nil {
-			ctx.JSON(http.StatusInternalServerError, errCreate)
+		if errGet != nil {
+			ctx.JSON(http.StatusInternalServerError, errGet)
 		}
 
 		ctx.JSON(http.StatusOK, eventSlots)

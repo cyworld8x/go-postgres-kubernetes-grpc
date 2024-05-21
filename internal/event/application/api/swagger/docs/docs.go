@@ -24,7 +24,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/event": {
+        "/events": {
             "post": {
                 "description": "Create event",
                 "consumes": [
@@ -70,7 +70,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/event/:id/slots": {
+        "/events/:id/slots": {
             "get": {
                 "description": "get slot of an event by event Id",
                 "consumes": [
@@ -117,7 +117,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/event/slot": {
+        "/events/slot": {
             "post": {
                 "description": "create slot for an event",
                 "consumes": [
@@ -170,7 +170,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/event/slot/{id}": {
+        "/events/slot/{id}": {
             "get": {
                 "description": "get slot event by event Id",
                 "consumes": [
@@ -214,7 +214,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/event/{id}": {
+        "/events/{id}": {
             "get": {
                 "description": "get event by Id",
                 "consumes": [

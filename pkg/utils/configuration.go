@@ -9,6 +9,7 @@ type Configuration struct {
 	GRPCServerAddress       string `mapstructure:"GRPC_SERVER_ADDRESS"`
 	TicketGRPCServerAddress string `mapstructure:"TICKET_GRPC_SERVER_ADDRESS"`
 	TicketAPIServerAddress  string `mapstructure:"TICKET_API_SERVER_ADDRESS"`
+	CrawlerAPIServerAddress string `mapstructure:"CRAWLER_API_SERVER_ADDRESS"`
 }
 
 // Configuration readling configuration from file
