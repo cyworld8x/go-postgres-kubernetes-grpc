@@ -24,6 +24,52 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/crawl": {
+            "post": {
+                "description": "Crawl website",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Crawler"
+                ],
+                "summary": "Crawl website",
+                "parameters": [
+                    {
+                        "description": "Website Info",
+                        "name": "arg",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/domain.WebSite"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/domain.Entry"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {}
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "schema": {}
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
         "/sources": {
             "get": {
                 "description": "get source by Id",
@@ -193,6 +239,10 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "domain.Entry": {
+            "type": "object",
+            "additionalProperties": {}
+        },
         "domain.Page": {
             "type": "object",
             "properties": {
@@ -210,23 +260,20 @@ const docTemplate = `{
         "domain.PageEvent": {
             "type": "object",
             "properties": {
+                "collectors": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/domain.PageObject"
+                    }
+                },
                 "enter_value": {
                     "type": "string"
                 },
                 "order": {
                     "type": "integer"
                 },
-                "parsed_objects": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/domain.PageObject"
-                    }
-                },
                 "selector": {
                     "type": "string"
-                },
-                "time_sleep": {
-                    "type": "integer"
                 },
                 "type": {
                     "type": "string"
@@ -239,7 +286,7 @@ const docTemplate = `{
                 "key": {
                     "type": "string"
                 },
-                "objects": {
+                "page_objects": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/domain.PageObject"

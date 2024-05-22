@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/crawler/application/api/handler"
 	docs "github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/crawler/application/api/swagger/docs"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/crawler/usecases/crawler"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/crawler/usecases/sources"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -11,8 +12,9 @@ import (
 
 // Server serves HTTP requests for our banking service.
 type Server struct {
-	uc     sources.UseCase
-	Router *gin.Engine
+	sourceUC  sources.UseCase
+	crawlerUC crawler.UseCase
+	Router    *gin.Engine
 }
 
 // NewServer creates a new gRPC server and set up routing.
@@ -34,16 +36,18 @@ type Server struct {
 
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
-func NewServer(uc sources.UseCase) *Server {
+func NewServer(sourceUC sources.UseCase, crawlerUC crawler.UseCase) *Server {
 
 	server := &Server{
-		uc: uc,
+		sourceUC:  sourceUC,
+		crawlerUC: crawlerUC,
 	}
 
 	router := gin.Default()
 	docs.SwaggerInfo.BasePath = "/api/v1"
 	routerGroup := router.Group(docs.SwaggerInfo.BasePath)
-	handler.MakeSourceHandler(routerGroup, uc)
+	handler.MakeSourceHandler(routerGroup, sourceUC)
+	handler.MakeCrawlerHandler(routerGroup, crawlerUC)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	server.Router = router
 	return server

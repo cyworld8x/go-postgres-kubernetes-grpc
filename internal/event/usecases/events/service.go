@@ -39,7 +39,7 @@ func (s *service) CloseEventSlot(ctx context.Context, id uuid.UUID) (*domain.Eve
 
 	event, err := s.repo.GetEvent(ctx, eventSlot.EventID)
 	if err != nil {
-		log.Error().Err(err).Msg("cannot get event")
+		log.Error().Err(err).Msg("cannot get event in CloseEventSlot func")
 		return eventSlotDto, err
 	}
 

@@ -1,5 +1,8 @@
 basePath: /api/v1
 definitions:
+  domain.Entry:
+    additionalProperties: {}
+    type: object
   domain.Page:
     properties:
       page_events:
@@ -11,18 +14,16 @@ definitions:
     type: object
   domain.PageEvent:
     properties:
+      collectors:
+        items:
+          $ref: '#/definitions/domain.PageObject'
+        type: array
       enter_value:
         type: string
       order:
         type: integer
-      parsed_objects:
-        items:
-          $ref: '#/definitions/domain.PageObject'
-        type: array
       selector:
         type: string
-      time_sleep:
-        type: integer
       type:
         type: string
     type: object
@@ -30,7 +31,7 @@ definitions:
     properties:
       key:
         type: string
-      objects:
+      page_objects:
         items:
           $ref: '#/definitions/domain.PageObject'
         type: array
@@ -73,6 +74,37 @@ info:
   title: Swagger Crawler API
   version: "1.0"
 paths:
+  /crawl:
+    post:
+      consumes:
+      - application/json
+      description: Crawl website
+      parameters:
+      - description: Website Info
+        in: body
+        name: arg
+        required: true
+        schema:
+          $ref: '#/definitions/domain.WebSite'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/domain.Entry'
+        "400":
+          description: Bad Request
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: Crawl website
+      tags:
+      - Crawler
   /sources:
     get:
       consumes:

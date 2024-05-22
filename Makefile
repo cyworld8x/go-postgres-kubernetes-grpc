@@ -8,7 +8,7 @@ dropdb:
 	docker exec -it postgres dropdb --username=postgres socialdb	
 swagger:
 	docker run --rm -v $(pwd):/code ghcr.io/swaggo/swag:latest
-swagger-gen-api:
+gen-swagger:
 	swag init -d internal/event/application/api/,internal/event/domain/  -g server.go  -o internal/event/application/api/swagger/docs/
 	swag init -d internal/crawler/application/api/,internal/crawler/domain/  -g server.go  -o internal/crawler/application/api/swagger/docs/
 migrateup:
@@ -35,7 +35,12 @@ proto:
 server:
 	go run main.go
 
-rebuild-db: createdb dropdb createdb migrateup
+install-playwright:
+	go run github.com/playwright-community/playwright-go/cmd/playwright@latest install --with-deps
+
+setup: install-playwright postgres
+
+rebuild-db: stoppostgres postgres createdb migrateup
 
 rebuild: sqlc proto 
 
@@ -47,5 +52,5 @@ run-crawler-api:
 	go run cmd/crawler/main.go
 run-user:
 	go run cmd/user/main.go
-.PHONY: postgres stoppostgres createdb dropdb migrateup migratedown sqlc test server mock proto migrateupuserdb rebuild-db rebuild run-ticket run-user
+.PHONY: postgres stoppostgres createdb dropdb migrateup migratedown sqlc test server mock proto rebuild-db rebuild run-ticket run-user gen-swagger setup install-playwright setup
 

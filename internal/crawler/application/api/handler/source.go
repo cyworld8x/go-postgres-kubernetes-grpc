@@ -10,12 +10,12 @@ import (
 	"github.com/google/uuid"
 )
 
-func MakeSourceHandler(router gin.IRouter, uc sources.UseCase) {
+func MakeSourceHandler(router gin.IRouter, sourcesUseCase sources.UseCase) {
 	router.Use(middleware.GinLogger())
-	router.POST("/sources", CreateSource(uc))
-	router.PUT("/sources", UpdateSource(uc))
-	router.GET("/sources/:id", GetSource(uc))
-	router.GET("/sources/", GetSources(uc))
+	router.POST("/sources", CreateSource(sourcesUseCase))
+	router.PUT("/sources", UpdateSource(sourcesUseCase))
+	router.GET("/sources/:id", GetSource(sourcesUseCase))
+	router.GET("/sources/", GetSources(sourcesUseCase))
 	// router.POST("/login", getLogin(service))
 	// router.Use(middleware.GinLogger())
 	// router.POST("/user", createUser(service))

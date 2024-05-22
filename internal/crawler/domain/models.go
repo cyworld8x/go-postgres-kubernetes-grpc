@@ -15,22 +15,18 @@ type Page struct {
 }
 
 type PageEvent struct {
-	Selector      string        `json:"selector"`
-	Type          string        `json:"type"`
-	EnterValue    string        `json:"enter_value"`
-	TimeSleep     int           `json:"time_sleep"`
-	Order         int           `json:"order"`
-	ParsedObjects *[]PageObject `json:"parsed_objects"`
+	Selector   string        `json:"selector"`
+	Type       string        `json:"type"`
+	EnterValue string        `json:"enter_value"`
+	Order      int           `json:"order"`
+	Collectors []*PageObject `json:"collectors"`
 }
 
 type PageObject struct {
 	Key          string        `json:"key"`
 	Selector     string        `json:"selector"`
 	RegexExtract string        `json:"regex_extract"`
-	PageObject   *[]PageObject `json:"objects"`
-}
-
-type Content interface {
+	PageObject   []*PageObject `json:"page_objects"`
 }
 
 type Source struct {
@@ -38,3 +34,8 @@ type Source struct {
 	Name string    `json:"name"`
 	Data WebSite   `json:"data"`
 }
+
+type Content interface {
+}
+
+type Entry map[string]Content

@@ -6,6 +6,7 @@ import (
 	api "github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/crawler/application/api"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/postgres"
 	utils "github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
+	"github.com/playwright-community/playwright-go"
 	"github.com/rs/zerolog/log"
 	"go.uber.org/automaxprocs/maxprocs"
 )
@@ -27,15 +28,16 @@ func main() {
 	}
 
 	log.Printf("Load env configuration %s", config)
-	app, err := api.Init(postgres.DBConnString(config.DbSource))
+	pw, err := playwright.Run()
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed init app")
-		cancel()
+		log.Fatal().Err(err).Msgf("could not start playwright: %v", err)
 	}
+	app, err := api.Init(postgres.DBConnString(config.DbSource), pw)
 	app.Server.Start(config.CrawlerAPIServerAddress)
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed start ticket API")
+		pw.Stop()
 		cancel()
 		<-ctx.Done()
 	}
