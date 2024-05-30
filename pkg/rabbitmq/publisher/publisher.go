@@ -91,7 +91,7 @@ func NewPublisher(connection *amqp.Connection) (*Publisher, error) {
 	}, nil
 }
 
-func (p *Publisher) Configure(options []Option) *Publisher {
+func (p *Publisher) Configure(options ...Option) *Publisher {
 	for _, option := range options {
 		option(p)
 	}
