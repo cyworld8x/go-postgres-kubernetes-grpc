@@ -15,7 +15,14 @@ type Worker struct {
 	mux    *asynq.ServeMux
 }
 
-func New(configuration *config.Configuration) *Worker {
+const (
+	_concurrency       = 10
+	_numCriticalQueues = 6
+	_numDefaulQueues   = 3
+	_numLowlQueues     = 3
+)
+
+func New(configuration *config.Configuration) IWorker {
 	redisClientOpt := asynq.RedisClientOpt{
 		Network:  configuration.Network,
 		Addr:     configuration.Addr,
@@ -28,12 +35,12 @@ func New(configuration *config.Configuration) *Worker {
 		redisClientOpt,
 		asynq.Config{
 			// Specify how many concurrent workers to use
-			Concurrency: 10,
+			Concurrency: _concurrency,
 			// Optionally specify multiple queues with different priority.
 			Queues: map[string]int{
-				"critical": 6,
-				"default":  3,
-				"low":      1,
+				"critical": _numCriticalQueues,
+				"default":  _numDefaulQueues,
+				"low":      _numLowlQueues,
 			},
 			// See the godoc for other configuration options
 		},

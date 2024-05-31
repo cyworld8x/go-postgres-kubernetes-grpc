@@ -49,7 +49,7 @@ type Distributor struct {
 // 	}
 // }
 
-func New(configuration *config.Configuration) *Distributor {
+func New(configuration *config.Configuration) IDistributor {
 	redisClientOpt := asynq.RedisClientOpt{
 		Network:  configuration.Network,
 		Addr:     configuration.Addr,

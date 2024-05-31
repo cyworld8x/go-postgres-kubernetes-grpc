@@ -53,10 +53,10 @@ const (
 	// DefaultPoolSize is the default pool size
 	_network = "tcp"
 	_addr    = "localhost:6379"
-	_db      = 64
+	_db      = 0
 )
 
-func NewTaskAsync(connection string) *TaskAsync {
+func New(connection string) *TaskAsync {
 	return &TaskAsync{
 		configuration: &config.Configuration{
 			Network: _network,
@@ -66,12 +66,12 @@ func NewTaskAsync(connection string) *TaskAsync {
 	}
 }
 
-func (taskAsync *TaskAsync) NewDistributor() *distributor.Distributor {
+func (taskAsync *TaskAsync) NewDistributor() distributor.IDistributor {
 
 	return distributor.New(taskAsync.configuration)
 }
 
-func (taskAsync *TaskAsync) NewWorker() *worker.Worker {
+func (taskAsync *TaskAsync) NewWorker() worker.IWorker {
 	return worker.New(taskAsync.configuration)
 }
 

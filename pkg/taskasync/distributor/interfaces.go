@@ -12,6 +12,5 @@ type Task struct {
 type TaskRegister func(task Task, opts []Option) *asynq.Task
 
 type IDistributor interface {
-	Configure(...Option) *Distributor
 	AddTask(task Task, opts ...asynq.Option) error
 }

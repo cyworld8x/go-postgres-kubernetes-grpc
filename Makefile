@@ -1,5 +1,15 @@
 postgres:
-	docker run --name postgres -p 20241:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -d postgres:16-alpine
+	docker run --rm --name postgres -p 20241:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -d postgres:16-alpine
+redis:
+	docker run --rm --name redis -p 6379:6379 -d redis:7.2.5-alpine -network redis-server --save 60 1 --loglevel warning
+rabbitmq:
+	docker run --rm --name rabbitmq -p 5677:5672 -p 15677:15672 -d -e RABBITMQ_DEFAULT_USER=rabbitmq -e RABBITMQ_DEFAULT_PASS=rabbitmq rabbitmq:3-management
+asynq-management:
+	docker run --rm \
+    --name asynqmon \
+    -p 8080:8080 \
+    hibiken/asynqmon:latest --redis-addr=host.docker.internal:6379\
+
 stoppostgres:
 	docker rm postgres
 createdb:
@@ -52,5 +62,5 @@ run-crawler-api:
 	go run cmd/crawler/main.go
 run-user:
 	go run cmd/user/main.go
-.PHONY: postgres stoppostgres createdb dropdb migrateup migratedown sqlc test server mock proto rebuild-db rebuild run-ticket run-user gen-swagger setup install-playwright setup
+.PHONY: postgres stoppostgres createdb dropdb migrateup migratedown sqlc test server mock proto rebuild-db rebuild run-ticket run-user gen-swagger setup install-playwright setup redis asynq-management
 

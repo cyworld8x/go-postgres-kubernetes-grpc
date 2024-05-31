@@ -60,7 +60,7 @@ func WithPublishDeliveryMode(publishDeliveryMode uint8) Option {
 }
 
 const (
-	_exchangeName = "Default Exchange"
+	_exchangeName = "direct"
 	_bindingKey   = "Default Binding Key"
 
 	_publishMandatory = false
@@ -71,7 +71,7 @@ const (
 )
 
 // NewPublisher creates a new Publisher struct.
-func NewPublisher(connection *amqp.Connection) (*Publisher, error) {
+func NewPublisher(connection *amqp.Connection) (EventPublisher, error) {
 	channel, err := connection.Channel()
 
 	if err != nil {
@@ -91,7 +91,7 @@ func NewPublisher(connection *amqp.Connection) (*Publisher, error) {
 	}, nil
 }
 
-func (p *Publisher) Configure(options ...Option) *Publisher {
+func (p *Publisher) Configure(options ...Option) EventPublisher {
 	for _, option := range options {
 		option(p)
 	}

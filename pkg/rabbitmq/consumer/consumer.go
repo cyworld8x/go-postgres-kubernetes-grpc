@@ -103,7 +103,7 @@ func NewConsumer(connection *amqp.Connection) (*Consumer, error) {
 
 	defaultConfig := Configuration{
 
-		WorkerPoolSize: 1,
+		WorkerPoolSize: 2,
 		Queue: QueueConfiguration{
 			Name:       "Default Queue",
 			BindingKey: "Default Binding Key",
@@ -113,7 +113,7 @@ func NewConsumer(connection *amqp.Connection) (*Consumer, error) {
 			NoWait:     false,
 		},
 		Exchange: ExchangeConfiguration{
-			Name:       "Default Exchange",
+			Name:       "",
 			Kind:       ExchangeKind,
 			Durable:    true,
 			AutoDelete: false,
@@ -125,7 +125,7 @@ func NewConsumer(connection *amqp.Connection) (*Consumer, error) {
 			Exclusive:   false,
 			NoLocal:     false,
 			NoWait:      false,
-			ConsumerTag: "Default Consumer Tag",
+			ConsumerTag: "Consumer Tag #1",
 		},
 	}
 
@@ -135,7 +135,7 @@ func NewConsumer(connection *amqp.Connection) (*Consumer, error) {
 	}, nil
 }
 
-func (c *Consumer) Configure(options []Option) *Consumer {
+func (c *Consumer) Configure(options ...Option) *Consumer {
 	for _, option := range options {
 		option(c)
 	}
@@ -200,7 +200,7 @@ func (c *Consumer) createChannel() (*amqp.Channel, error) {
 		return nil, err
 	}
 
-	_, err = channel.QueueDeclare(
+	queue, err := channel.QueueDeclare(
 		c.configuration.Queue.Name,
 		c.configuration.Queue.Durable,
 		c.configuration.Queue.AutoDelete,
@@ -213,7 +213,7 @@ func (c *Consumer) createChannel() (*amqp.Channel, error) {
 	}
 
 	err = channel.QueueBind(
-		c.configuration.Queue.Name,
+		queue.Name,
 		c.configuration.Queue.BindingKey,
 		c.configuration.Exchange.Name,
 		c.configuration.Queue.NoWait,
