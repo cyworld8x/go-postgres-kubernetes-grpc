@@ -5,9 +5,56 @@
 package postgres
 
 import (
+	"database/sql/driver"
+	"fmt"
+
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
 )
+
+type Role string
+
+const (
+	RoleAdmin      Role = "Admin"
+	RoleBuyer      Role = "Buyer"
+	RoleEventOwner Role = "EventOwner"
+	RoleSeller     Role = "Seller"
+)
+
+func (e *Role) Scan(src interface{}) error {
+	switch s := src.(type) {
+	case []byte:
+		*e = Role(s)
+	case string:
+		*e = Role(s)
+	default:
+		return fmt.Errorf("unsupported scan type for Role: %T", src)
+	}
+	return nil
+}
+
+type NullRole struct {
+	Role  Role `json:"role"`
+	Valid bool `json:"valid"` // Valid is true if Role is not NULL
+}
+
+// Scan implements the Scanner interface.
+func (ns *NullRole) Scan(value interface{}) error {
+	if value == nil {
+		ns.Role, ns.Valid = "", false
+		return nil
+	}
+	ns.Valid = true
+	return ns.Role.Scan(value)
+}
+
+// Value implements the driver Valuer interface.
+func (ns NullRole) Value() (driver.Value, error) {
+	if !ns.Valid {
+		return nil, nil
+	}
+	return string(ns.Role), nil
+}
 
 type DbUser struct {
 	ID          uuid.UUID        `json:"id"`
@@ -17,7 +64,7 @@ type DbUser struct {
 	Password    string           `json:"password"`
 	Email       pgtype.Text      `json:"email"`
 	Status      bool             `json:"status"`
-	Role        int32            `json:"role"`
+	Role        Role             `json:"role"`
 	Created     pgtype.Timestamp `json:"created"`
 	Updated     pgtype.Timestamp `json:"updated"`
 }

@@ -7,21 +7,17 @@ package domain
 import (
 	"database/sql"
 	"time"
-	"fmt"
-
 	"github.com/google/uuid"
 )
 
-type Role int8
-const (
-    Admin Role = -1
-    Buyer Role = 0
-    EventOwner Role = 1
-)
+type Role string
 
-func (e Role) String() string {
-	return fmt.Sprintf("%d", int(e))
-}
+const (
+	Admin      Role = "Admin"
+	Buyer      Role = "Buyer"
+	EventOwner Role = "EventOwner"
+	Seller     Role = "Seller"
+)
 
 type User struct {
 	ID          uuid.UUID      `json:"id"`
@@ -31,7 +27,29 @@ type User struct {
 	Password    string         `json:"password"`
 	Email       sql.NullString `json:"email"`
 	Status      bool           `json:"status"`
-	Role        int32          `json:"role"`
+	Role        string          `json:"role"`
 	Created     time.Time      `json:"created"`
 	Updated     time.Time      `json:"updated"`
 }
+
+type NewUser struct {
+	Username    string         `json:"username"`
+	DisplayName string `json:"display_name"`
+	Password    string         `json:"password"`
+	Email       string `json:"email"`
+	Role        string          `json:"role"`
+}
+
+type UserLogin struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type UserAccount struct {
+	Username    string         `json:"username"`
+	DisplayName string `json:"display_name"`
+	Email       string `json:"email"`
+	Role        string          `json:"role"`
+	Token	   string         `json:"token"`
+}
+

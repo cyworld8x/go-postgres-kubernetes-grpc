@@ -44,7 +44,7 @@ type CreateUserParams struct {
 	Email       pgtype.Text `json:"email"`
 	DisplayName pgtype.Text `json:"display_name"`
 	Password    string      `json:"password"`
-	Role        int32       `json:"role"`
+	Role        Role        `json:"role"`
 	Code        string      `json:"code"`
 }
 

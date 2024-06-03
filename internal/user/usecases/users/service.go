@@ -23,7 +23,7 @@ func NewService(repo domain.UserRepository) UseCase {
 }
 
 // CreateUser implements UseCase.
-func (s *service) CreateUser(ctx context.Context, username string, email string, displayName string, pwd string, role int) (domain.User, error) {
+func (s *service) CreateUser(ctx context.Context, username string, email string, displayName string, pwd string, role string) (domain.User, error) {
 
 	pwdhash, err := password.HashPassword(pwd)
 	if err != nil {
@@ -34,7 +34,7 @@ func (s *service) CreateUser(ctx context.Context, username string, email string,
 		Email:       pgtype.Text{String: email, Valid: true},
 		DisplayName: pgtype.Text{String: displayName, Valid: true},
 		Password:    pwdhash,
-		Role:        int32(role),
+		Role:        postgres.Role(role), // Convert role to postgres.Role
 		Code:        "unknown",
 	}
 
@@ -49,7 +49,7 @@ func (s *service) CreateUser(ctx context.Context, username string, email string,
 		Email:       sql.NullString{String: dbUser.Email.String, Valid: true},
 		DisplayName: sql.NullString{String: dbUser.DisplayName.String, Valid: true},
 		Password:    dbUser.Password,
-		Role:        dbUser.Role,
+		Role:        string(dbUser.Role),
 		Created:     dbUser.Created.Time,
 		Updated:     dbUser.Updated.Time,
 	}, nil
@@ -68,7 +68,8 @@ func (s *service) GetLogin(ctx context.Context, username string) (domain.User, e
 		Username:    dbUser.Username,
 		Email:       sql.NullString{String: dbUser.Email.String, Valid: true},
 		DisplayName: sql.NullString{String: dbUser.DisplayName.String, Valid: true},
-		Role:        dbUser.Role,
+		Role:        string(dbUser.Role),
+		Password:    dbUser.Password,
 		Created:     dbUser.Created.Time,
 		Updated:     dbUser.Updated.Time,
 	}, nil
@@ -86,7 +87,7 @@ func (s *service) GetUser(ctx context.Context, id uuid.UUID) (domain.User, error
 		Username:    dbUser.Username,
 		Email:       sql.NullString{String: dbUser.Email.String, Valid: true},
 		DisplayName: sql.NullString{String: dbUser.DisplayName.String, Valid: true},
-		Role:        dbUser.Role,
+		Role:        string(dbUser.Role),
 		Created:     dbUser.Created.Time,
 		Updated:     dbUser.Updated.Time,
 	}, nil

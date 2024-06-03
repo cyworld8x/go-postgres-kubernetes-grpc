@@ -2,8 +2,13 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/application/api"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/application/grpcserver"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/postgres"
 	utils "github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
@@ -19,11 +24,16 @@ func main() {
 		log.Err(err).Msg("failed set max procs")
 	}
 
+	config, err := utils.LoadConfiguration(".")
+	if err != nil {
+		log.Fatal().Err(err).Msg("can not load env configuration")
+	}
+
+	log.Printf("Load env configuration %s", config)
+
+	go startUserAPIServer(config)
+
 	ctx, cancel := context.WithCancel(context.Background())
-
-	log.Info().Msg("⚡ init user grpc app")
-
-	// set up logrus
 
 	server := grpc.NewServer()
 
@@ -32,12 +42,8 @@ func main() {
 		<-ctx.Done()
 	}()
 
-	config, err := utils.LoadConfiguration(".")
-	if err != nil {
-		log.Fatal().Err(err).Msg("can not load env configuration")
-	}
+	//Start gRPC server
 
-	log.Printf("Load env configuration %s", config)
 	_, err = grpcserver.Init(postgres.DBConnString(config.DbSource), server)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed init app")
@@ -54,37 +60,34 @@ func main() {
 		log.Fatal().Err(err).Msg("cannot start gRPC server")
 	}
 
-	// 	// gRPC Server.
-	// 	address := fmt.Sprintf("0.0.0.0:20242")
-	// 	network := "tcp"
+	defer func() {
+		if err1 := listener.Close(); err != nil {
+			log.Err(err).Msg(fmt.Sprintf("failed to close %s :%s", config.GRPCServerAddress, err1))
+		}
+	}()
 
-	// 	l, err := net.Listen(network, address)
-	// 	if err != nil {
-	// 		log.Err(err).Msg(fmt.Sprintf("failed to listen to address %s : %s ", network, address))
-	// 		cancel()
-	// 	}
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
-	// 	log.Log().Msg(fmt.Sprintf("🌏 start server... %s", address))
+	select {
+	case v := <-quit:
+		log.Err(err).Msg(fmt.Sprintf("signal.Notify %s", v))
+	case done := <-ctx.Done():
+		log.Err(err).Msg(fmt.Sprintf("ctx.Done %s", done))
+	}
 
-	// 	defer func() {
-	// 		if err1 := l.Close(); err != nil {
-	// 			log.Err(err).Msg(fmt.Sprintf("failed to close %s: %s :%s", network, address, err1))
-	// 		}
-	// 	}()
+}
 
-	// 	err = server.Serve(l)
-	// 	if err != nil {
-	// 		log.Err(err).Msg(fmt.Sprintf("failed start gRPC server  %s: %s :%s", network, address, err))
-	// 		cancel()
-	// 	}
+func startUserAPIServer(config utils.Configuration) {
+	//Start API
 
-	// 	quit := make(chan os.Signal, 1)
-	// 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
+	app, err := api.Init(postgres.DBConnString(config.DbSource))
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed init app")
+	}
+	app.Server.Start(config.HTTPServerAddress)
 
-	// 	select {
-	// 	case v := <-quit:
-	// 		log.Err(err).Msg(fmt.Sprintf("signal.Notify %s", v))
-	// 	case done := <-ctx.Done():
-	// 		log.Err(err).Msg(fmt.Sprintf("ctx.Done %s", done))
-	// 	}
+	if err != nil {
+		log.Fatal().Err(err).Msg("failed start User API Server")
+	}
 }

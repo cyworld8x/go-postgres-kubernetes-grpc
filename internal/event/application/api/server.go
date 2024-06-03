@@ -2,7 +2,7 @@ package api
 
 import (
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/event/application/api/handler"
-	docs "github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/event/application/api/swagger/docs"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/event/application/api/swagger/docs"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/event/usecases/events"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"

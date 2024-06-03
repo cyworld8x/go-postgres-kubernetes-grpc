@@ -2,7 +2,6 @@ package grpcserver
 
 import (
 	"context"
-	"strconv"
 	"time"
 
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/paseto"
@@ -19,7 +18,7 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		return &pb.User{}, err
 	}
 
-	dbUser, err := server.uc.CreateUser(ctx, req.GetUsername(), req.GetEmail(), req.GetFullname(), pwd, 0)
+	dbUser, err := server.uc.CreateUser(ctx, req.GetUsername(), req.GetEmail(), req.GetFullname(), pwd, req.GetRole())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot create user: %v", err)
 	}
@@ -28,7 +27,7 @@ func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest)
 		Email:     dbUser.Email.String,
 		Fullname:  dbUser.DisplayName.String,
 		Password:  dbUser.Password,
-		Role:      strconv.Itoa(int(dbUser.Role)),
+		Role:      dbUser.Role,
 		CreatedAt: timestamppb.New(dbUser.Created),
 		// Add more fields as needed
 	}, nil

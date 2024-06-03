@@ -7,7 +7,7 @@ import (
 
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/domain"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/domain/mock"
-	entites "github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/infrastructure/repository/postgres"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/infrastructure/repository/postgres"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 	"github.com/golang/mock/gomock"
 	"github.com/jackc/pgx/v5/pgtype"
@@ -27,15 +27,15 @@ func TestCreate(t *testing.T) {
 		Email:       sql.NullString{String: genUser.Email, Valid: true},
 		DisplayName: sql.NullString{String: genUser.Name.First + " " + genUser.Name.Last, Valid: true},
 		Password:    pwdhash,
-		Role:        0,
+		Role:        string(domain.Buyer),
 	}
 
-	dbUser := &entites.DbUser{
+	dbUser := &postgres.DbUser{
 		Username:    user.Username,
 		Email:       pgtype.Text{String: user.Email.String, Valid: true},
 		DisplayName: pgtype.Text{String: user.DisplayName.String, Valid: true},
 		Password:    user.Password,
-		Role:        0,
+		Role:        postgres.RoleBuyer,
 	}
 
 	userRepository.EXPECT().
@@ -45,7 +45,7 @@ func TestCreate(t *testing.T) {
 
 	m := NewService(userRepository)
 	u := user
-	_, err := m.CreateUser(context.Background(), u.Username, u.Email.String, u.DisplayName.String, u.Password, int(u.Role))
+	_, err := m.CreateUser(context.Background(), u.Username, u.Email.String, u.DisplayName.String, u.Password, u.Role)
 	assert.Nil(t, err)
 	assert.NotEmpty(t, u.Created.IsZero())
 }
