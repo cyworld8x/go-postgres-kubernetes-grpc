@@ -1,4 +1,4 @@
-package db
+package repository
 
 import (
 	"context"
@@ -13,10 +13,10 @@ import (
 	_ "github.com/lib/pq"
 )
 
-var testStore Store
+var testStore repository
 
 func TestMain(m *testing.M) {
-	config, err := utils.LoadConfiguration("../..")
+	config, err := utils.LoadConfiguration("../../../..")
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("can not load env configuration.")
@@ -27,7 +27,7 @@ func TestMain(m *testing.M) {
 		log.Fatal().Err(err).Msg("can not connect to db.")
 	}
 
-	testStore = NewStore(conn)
+	testStore = NewRepository(conn)
 	os.Exit(m.Run())
 
 }

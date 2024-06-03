@@ -3,6 +3,7 @@ package handler_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -11,12 +12,15 @@ import (
 	api "github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/application/api"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/domain/mock"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/infrastructure/repository/postgres"
+	middleware "github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/middleware"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/paseto"
 	pg "github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/postgres"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/mock/gomock"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgtype"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -204,4 +208,83 @@ func newTestServer(t *testing.T) (*api.Server, error) {
 
 	return app.Server, err
 
+}
+
+func TestAuthMiddlewareValidToken(t *testing.T) {
+	// Create a new Gin router
+	serverTest, _ := newTestServer(t)
+
+	// Create PasetoMaker
+	pasetoMaker, _ := paseto.NewPasetoMaker()
+	// Add the AuthMiddleware to the router
+	serverTest.Router.GET(
+		"/auth",
+		middleware.AuthMiddleware(pasetoMaker),
+		func(ctx *gin.Context) {
+			ctx.JSON(http.StatusOK, gin.H{})
+		},
+	)
+
+	// Create a test request with a valid token
+	req := httptest.NewRequest(http.MethodGet, "/auth", nil)
+	token, payload, err := pasetoMaker.CreateToken("username", time.Hour)
+	require.NoError(t, err)
+	require.NotEmpty(t, payload)
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+
+	// Create a test response recorder
+	res := httptest.NewRecorder()
+
+	// Perform the request
+	serverTest.Router.ServeHTTP(res, req)
+
+	// Assert that the response status code is 200 OK
+	assert.Equal(t, http.StatusOK, res.Code)
+}
+
+func TestAuthMiddlewareInvalidToken(t *testing.T) {
+	// Create a new Gin router
+	router := gin.New()
+
+	// Create PasetoMaker
+	pasetoMaker, _ := paseto.NewPasetoMaker()
+
+	// Add the AuthMiddleware to the router
+	router.Use(middleware.AuthMiddleware(pasetoMaker))
+
+	// Create a test request with an invalid token
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	req.Header.Set("Authorization", "Bearer invalid_token")
+
+	// Create a test response recorder
+	res := httptest.NewRecorder()
+
+	// Perform the request
+	router.ServeHTTP(res, req)
+
+	// Assert that the response status code is 401 Unauthorized
+	assert.Equal(t, http.StatusUnauthorized, res.Code)
+}
+
+func TestAuthMiddlewareMissingToken(t *testing.T) {
+	// Create a new Gin router
+	router := gin.New()
+
+	// Create PasetoMaker
+	pasetoMaker, _ := paseto.NewPasetoMaker()
+
+	// Add the AuthMiddleware to the router
+	router.Use(middleware.AuthMiddleware(pasetoMaker))
+
+	// Create a test request without the Authorization header
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+
+	// Create a test response recorder
+	res := httptest.NewRecorder()
+
+	// Perform the request
+	router.ServeHTTP(res, req)
+
+	// Assert that the response status code is 401 Unauthorized
+	assert.Equal(t, http.StatusUnauthorized, res.Code)
 }
