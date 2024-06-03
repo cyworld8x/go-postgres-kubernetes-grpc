@@ -34,6 +34,18 @@ jobs:
         ports:
           # Maps tcp port 5432 on service container to the host
           - 20241:5432
+      redis:
+        image: redis:7.2.5-alpine
+        ports:
+          - 6379:6379
+      rabbitmq:
+        image: rabbitmq:3-management
+        env:
+          RABBITMQ_DEFAULT_USER: rabbitmq
+          RABBITMQ_DEFAULT_PASS: rabbitmq
+        ports:
+          - 5677:5672
+          - 15677:15672
     steps:
     - uses: actions/checkout@v3
 
