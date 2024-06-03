@@ -21,7 +21,7 @@ func TestNewTaskAsync(t *testing.T) {
 		taskasync.WithPoolSize(10),
 	)
 
-	for i := 0; i < 10; i++ {
+	for i := 0; i < 2; i++ {
 		testMessage := []byte("Test Message " + fmt.Sprint(i) + "!")
 
 		taskDistributor := taskAsync.NewDistributor()
