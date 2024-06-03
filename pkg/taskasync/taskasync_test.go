@@ -21,11 +21,10 @@ func TestNewTaskAsync(t *testing.T) {
 		taskasync.WithPoolSize(10),
 	)
 
+	taskDistributor := taskAsync.NewDistributor()
+	
 	for i := 0; i < 2; i++ {
 		testMessage := []byte("Test Message " + fmt.Sprint(i) + "!")
-
-		taskDistributor := taskAsync.NewDistributor()
-
 		err := taskDistributor.AddTask(distributor.Task{
 			TypeName: "task:message",
 			Payload:  testMessage,
