@@ -3,6 +3,7 @@ package rabbitmq_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/rabbitmq"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/rabbitmq/consumer"
@@ -46,19 +47,26 @@ func TestNewRabbitMQ(t *testing.T) {
 	taskConsumer := consumer.TaskConsumer(func(ctx context.Context, messages <-chan amqp.Delivery) {
 		for message := range messages {
 			t.Logf("Received message: %d", message.Body)
-			message.Ack(false)
+			assert.NotEmpty(t, message.Body, "Message body should not be empty")
+			err = message.Ack(false)
+			if err != nil {
+				t.Errorf("Failed to acknowledge message: %v", err)
+			}
+			assert.Nil(t, err)
 		}
 	})
 
-	err = eventConsumer.Consume(taskConsumer)
-	if err != nil {
-		t.Errorf("Failed to create a new consumer: %v", err)
-		cancel()
-	}
+	go func() {
+		err = eventConsumer.Consume(taskConsumer)
+		if err != nil {
+			t.Error("failed to start Consumer", err)
+			cancel()
+		}
+	}()
 
+	time.Sleep(10 * time.Second)
 	if err != nil {
 		t.Errorf("Failed to consume messages: %v", err)
 	}
-
 	assert.Nil(t, err)
 }

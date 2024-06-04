@@ -58,8 +58,10 @@ func New(configuration *config.Configuration) IDistributor {
 		Username: configuration.Username,
 		PoolSize: configuration.PoolSize,
 	}
+	client := asynq.NewClient(redisClientOpt)
+
 	return &Distributor{
-		client:        asynq.NewClient(redisClientOpt),
+		client:        client,
 		configuration: redisClientOpt,
 	}
 }
@@ -68,4 +70,8 @@ func (c *Distributor) AddTask(task Task, opts ...asynq.Option) error {
 	taskRegister := asynq.NewTask(task.TypeName, task.Payload, opts...)
 	_, err := c.client.Enqueue(taskRegister)
 	return err
+}
+
+func (c *Distributor) Close() error {
+	return c.client.Close()
 }

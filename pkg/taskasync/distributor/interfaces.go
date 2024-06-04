@@ -13,4 +13,5 @@ type TaskRegister func(task Task, opts []Option) *asynq.Task
 
 type IDistributor interface {
 	AddTask(task Task, opts ...asynq.Option) error
+	Close() error
 }

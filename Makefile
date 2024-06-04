@@ -1,7 +1,7 @@
 postgres:
 	docker run --rm --name postgres -p 20241:5432 -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -d postgres:16-alpine
 redis:
-	docker run --rm --name redis -p 6379:6379 -d redis:7.2.5-alpine -network redis-server --save 60 1 --loglevel warning
+	docker run --rm --name redis -p 6379:6379 -d redis:7.2.5-alpine --save 60 1 --loglevel warning
 rabbitmq:
 	docker run --rm --name rabbitmq -p 5677:5672 -p 15677:15672 -d -e RABBITMQ_DEFAULT_USER=rabbitmq -e RABBITMQ_DEFAULT_PASS=rabbitmq rabbitmq:3-management
 asynq-management:
