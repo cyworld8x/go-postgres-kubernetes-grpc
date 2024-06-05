@@ -25,7 +25,9 @@ message GetLoginResponse {
     string id = 1;
     string username = 2;
     string token = 3;
-    string password = 4;
+    string email = 4;
+    string display_name = 5;
+    string role = 6;
 }
 
 message User {
