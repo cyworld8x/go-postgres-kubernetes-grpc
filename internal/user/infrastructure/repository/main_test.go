@@ -7,8 +7,6 @@ import (
 
 	"github.com/rs/zerolog/log"
 
-	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
-
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/lib/pq"
 )
@@ -16,13 +14,9 @@ import (
 var testStore repository
 
 func TestMain(m *testing.M) {
-	config, err := utils.LoadConfiguration("../../../..")
+	dbSource := "postgresql://postgres:postgres@localhost:20241/socialdb?sslmode=disable"
 
-	if err != nil {
-		log.Fatal().Err(err).Msg("can not load env configuration.")
-	}
-
-	conn, err := pgxpool.New(context.Background(), config.DbSource)
+	conn, err := pgxpool.New(context.Background(), dbSource)
 	if err != nil {
 		log.Fatal().Err(err).Msg("can not connect to db.")
 	}

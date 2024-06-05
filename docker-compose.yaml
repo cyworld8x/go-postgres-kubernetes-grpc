@@ -13,20 +13,71 @@ services:
       - "20241:5432"
     volumes:
       - data-volume:/var/lib/postgresql/data
-  api:
-    container_name: api
+  redis:
+    container_name: redis
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+  rabitmq:
+    container_name: rabitmq
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=rabbitmq
+      - RABBITMQ_DEFAULT_PASS=rabbitmq
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 3
+    ports:
+      - "15677:15672"
+      - "5677:5672"
+  user-app:
+    container_name: user-app
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: /docker/user/Dockerfile
     ports:
       - "8080:8080"
       - "8081:8081"
-      - "8082:8082"
     environment:
       - DB_SOURCE=postgresql://postgres:postgres@postgres:5432/socialdb?sslmode=disable
     depends_on:
       - postgres
     entrypoint: [ "/app/wait-for.sh", "postgres:5432", "--", "/app/start.sh"]
     command: [ "/app/main" ]
+  ticket-app:
+    container_name: ticket-app
+    build:
+      context: .
+      dockerfile: /docker/ticket/Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      - DB_SOURCE=postgresql://postgres:postgres@postgres:5432/socialdb?sslmode=disable
+    depends_on:
+      - postgres
+  event-app:
+    container_name: event-app
+    build:
+      context: .
+      dockerfile: /docker/event/Dockerfile
+    ports:
+      - "8083:8083"
+    environment:
+      - DB_SOURCE=postgresql://postgres:postgres@postgres:5432/socialdb?sslmode=disable
+    depends_on:
+      - postgres
+  crawler-app:
+    container_name: crawler-app
+    build:
+      context: .
+      dockerfile: /docker/crawler/Dockerfile
+    ports:
+      - "8084:8084"
+    environment:
+      - DB_SOURCE=postgresql://postgres:postgres@postgres:5432/socialdb?sslmode=disable
+    depends_on:
+      - postgres
 volumes:
   data-volume:

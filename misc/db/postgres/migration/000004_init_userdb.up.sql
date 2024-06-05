@@ -1,4 +1,4 @@
-CREATE SCHEMA "db" ;
+CREATE SCHEMA IF NOT EXISTS "db";
 
 CREATE TYPE role AS ENUM ('Admin', 'Buyer', 'EventOwner' , 'Seller');
 CREATE TABLE "db"."users" (

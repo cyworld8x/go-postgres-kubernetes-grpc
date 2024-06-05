@@ -8,10 +8,10 @@ import (
 	"os/signal"
 	"syscall"
 
+	configuration "github.com/cyworld8x/go-postgres-kubernetes-grpc/cmd/user/config"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/application/api"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/application/grpcserver"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/postgres"
-	utils "github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 	"github.com/rs/zerolog/log"
 	"go.uber.org/automaxprocs/maxprocs"
 	"google.golang.org/grpc"
@@ -24,7 +24,7 @@ func main() {
 		log.Err(err).Msg("failed set max procs")
 	}
 
-	config, err := utils.LoadConfiguration(".")
+	config, err := configuration.Load()
 	if err != nil {
 		log.Fatal().Err(err).Msg("can not load env configuration")
 	}
@@ -78,14 +78,14 @@ func main() {
 
 }
 
-func startUserAPIServer(config utils.Configuration) {
+func startUserAPIServer(config configuration.Config) {
 	//Start API
 
 	app, err := api.Init(postgres.DBConnString(config.DbSource))
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed init app")
 	}
-	app.Server.Start(config.HTTPServerAddress)
+	app.Server.Start(config.HttpServerAddress)
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed start User API Server")

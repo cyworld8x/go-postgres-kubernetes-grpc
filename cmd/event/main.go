@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 
-	api "github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/event/application/api"
+	configuration "github.com/cyworld8x/go-postgres-kubernetes-grpc/cmd/event/config"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/event/application/api"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/postgres"
-	utils "github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 	"github.com/rs/zerolog/log"
 	"go.uber.org/automaxprocs/maxprocs"
 )
@@ -21,7 +21,7 @@ func main() {
 
 	log.Info().Msg("⚡ init ticket api app")
 
-	config, err := utils.LoadConfiguration(".")
+	config, err := configuration.Load()
 	if err != nil {
 		log.Fatal().Err(err).Msg("can not load env configuration")
 	}
@@ -32,7 +32,7 @@ func main() {
 		log.Fatal().Err(err).Msg("failed init app")
 		cancel()
 	}
-	app.Server.Start(config.TicketAPIServerAddress)
+	app.Server.Start(config.HttpServerAddress)
 
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed start ticket API")

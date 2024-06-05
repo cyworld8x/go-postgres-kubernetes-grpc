@@ -13,16 +13,13 @@ import (
 )
 
 func (server *Server) CreateUser(ctx context.Context, req *pb.CreateUserRequest) (*pb.User, error) {
-	pwd, err := utils.HashPassword(req.GetPassword())
-	if err != nil {
-		return &pb.User{}, err
-	}
 
-	dbUser, err := server.uc.CreateUser(ctx, req.GetUsername(), req.GetEmail(), req.GetFullname(), pwd, req.GetRole())
+	dbUser, err := server.uc.CreateUser(ctx, req.GetUsername(), req.GetEmail(), req.GetFullname(), req.GetPassword(), req.GetRole())
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "cannot create user: %v", err)
 	}
 	return &pb.User{
+		ID:        dbUser.ID.String(),
 		Username:  dbUser.Username,
 		Email:     dbUser.Email.String,
 		Fullname:  dbUser.DisplayName.String,
@@ -46,7 +43,7 @@ func (server *Server) GetLogin(ctx context.Context, req *pb.GetLoginRequest) (*p
 	}
 
 	rsp := &pb.GetLoginResponse{
-		Id:       0,
+		Id:       user.ID.String(),
 		Username: req.GetUsername(),
 		Password: req.GetPassword(),
 	}

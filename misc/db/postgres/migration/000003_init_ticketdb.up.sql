@@ -1,6 +1,4 @@
-CREATE SCHEMA "user";
-
-
+CREATE SCHEMA IF NOT EXISTS "user";
 
 CREATE TYPE ticket_status AS ENUM ('New', 'Booked', 'CheckedIn' , 'InStock');
 

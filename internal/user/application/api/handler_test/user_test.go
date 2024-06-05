@@ -196,12 +196,10 @@ func TestGetLogin(t *testing.T) {
 }
 
 func newTestServer(t *testing.T) (*api.Server, error) {
-	testConfig := utils.Configuration{
-		DbSource:          "postgresql://postgres:postgres@localhost:20241/socialdb?sslmode=disable",
-		HTTPServerAddress: "localhost:8080",
-	}
 
-	app, err := api.Init(pg.DBConnString(testConfig.DbSource))
+	dbSource := "postgresql://postgres:postgres@localhost:20241/socialdb?sslmode=disable"
+
+	app, err := api.Init(pg.DBConnString(dbSource))
 	if err != nil {
 		t.Fatalf("failed to init app: %v", err)
 	}

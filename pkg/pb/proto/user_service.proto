@@ -22,14 +22,14 @@ message GetLoginRequest {
 }
 
 message GetLoginResponse {
-    int32 id = 1;
+    string id = 1;
     string username = 2;
     string token = 3;
     string password = 4;
 }
 
 message User {
-    int32 ID = 1;
+    string ID = 1;
     string username = 2;
     string email = 3;
     string password = 4;
@@ -39,5 +39,5 @@ message User {
 }
 
 message GetUserIdRequest {
-    int32 id = 1;
+    string id = 1;
 }

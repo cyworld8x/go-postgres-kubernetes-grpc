@@ -2,11 +2,15 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"net"
+	"os"
+	"os/signal"
+	"syscall"
 
+	configuration "github.com/cyworld8x/go-postgres-kubernetes-grpc/cmd/ticket/config"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/ticket/application/grpcserver"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/postgres"
-	utils "github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/utils"
 	"github.com/rs/zerolog/log"
 	"go.uber.org/automaxprocs/maxprocs"
 	"google.golang.org/grpc"
@@ -32,7 +36,7 @@ func main() {
 		<-ctx.Done()
 	}()
 
-	config, err := utils.LoadConfiguration(".")
+	config, err := configuration.Load()
 	if err != nil {
 		log.Fatal().Err(err).Msg("can not load env configuration")
 	}
@@ -44,49 +48,31 @@ func main() {
 		cancel()
 	}
 	//gRPCServerAddress := "0.0.0.0:20242"
-	listener, err := net.Listen("tcp", config.TicketGRPCServerAddress)
+	listener, err := net.Listen("tcp", config.GRPCServerAddress)
 	if err != nil {
-		log.Fatal().Err(err).Msg("cannot create listener: " + config.TicketGRPCServerAddress)
+		log.Fatal().Err(err).Msg("cannot create listener: " + config.GRPCServerAddress)
 		cancel()
 	}
-	log.Printf("start gRPC server on %s", config.TicketGRPCServerAddress)
+	log.Printf("start gRPC server on %s", config.GRPCServerAddress)
 	err = server.Serve(listener)
 	if err != nil {
 		log.Fatal().Err(err).Msg("cannot start gRPC server")
 		cancel()
 	}
 
-	// 	// gRPC Server.
-	// 	address := fmt.Sprintf("0.0.0.0:20242")
-	// 	network := "tcp"
+	defer func() {
+		if err1 := listener.Close(); err != nil {
+			log.Err(err).Msg(fmt.Sprintf("failed to close %s :%s", config.GRPCServerAddress, err1))
+		}
+	}()
 
-	// 	l, err := net.Listen(network, address)
-	// 	if err != nil {
-	// 		log.Err(err).Msg(fmt.Sprintf("failed to listen to address %s : %s ", network, address))
-	// 		cancel()
-	// 	}
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
 
-	// 	log.Log().Msg(fmt.Sprintf("🌏 start server... %s", address))
-
-	// 	defer func() {
-	// 		if err1 := l.Close(); err != nil {
-	// 			log.Err(err).Msg(fmt.Sprintf("failed to close %s: %s :%s", network, address, err1))
-	// 		}
-	// 	}()
-
-	// 	err = server.Serve(l)
-	// 	if err != nil {
-	// 		log.Err(err).Msg(fmt.Sprintf("failed start gRPC server  %s: %s :%s", network, address, err))
-	// 		cancel()
-	// 	}
-
-	// 	quit := make(chan os.Signal, 1)
-	// 	signal.Notify(quit, os.Interrupt, syscall.SIGTERM)
-
-	// 	select {
-	// 	case v := <-quit:
-	// 		log.Err(err).Msg(fmt.Sprintf("signal.Notify %s", v))
-	// 	case done := <-ctx.Done():
-	// 		log.Err(err).Msg(fmt.Sprintf("ctx.Done %s", done))
-	// 	}
+	select {
+	case v := <-quit:
+		log.Err(err).Msg(fmt.Sprintf("signal.Notify %s", v))
+	case done := <-ctx.Done():
+		log.Err(err).Msg(fmt.Sprintf("ctx.Done %s", done))
+	}
 }
