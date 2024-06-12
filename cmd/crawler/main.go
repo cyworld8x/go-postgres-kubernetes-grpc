@@ -20,7 +20,7 @@ func main() {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	log.Info().Msg("⚡ init ticket api app")
+	log.Info().Msg("⚡ init crawler api app")
 
 	config, err := configuration.Load()
 	if err != nil {
@@ -28,6 +28,9 @@ func main() {
 	}
 
 	log.Printf("Load env configuration %s", config)
+	if playwright.Install() != nil {
+		log.Fatal().Msg("could not install playwright")
+	}
 	pw, err := playwright.Run()
 	if err != nil {
 		log.Fatal().Err(err).Msgf("could not start playwright: %v", err)

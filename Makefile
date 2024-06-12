@@ -42,13 +42,9 @@ proto:
 	protoc --go_out=. \
     --go-grpc_out=. \
     pkg/pb/proto/*.proto
-server:
-	go run main.go
 
 install-playwright:
 	go run github.com/playwright-community/playwright-go/cmd/playwright@latest install --with-deps
-
-setup: install-playwright postgres
 
 rebuild-db: stoppostgres postgres createdb migrateup
 
@@ -62,5 +58,5 @@ run-crawler-api:
 	go run cmd/crawler/main.go
 run-user:
 	go run cmd/user/main.go
-.PHONY: postgres stoppostgres createdb dropdb migrateup migratedown sqlc test server mock proto rebuild-db rebuild run-ticket run-user gen-swagger setup install-playwright setup redis asynq-management
+.PHONY: postgres stoppostgres createdb dropdb migrateup migratedown sqlc test server mock proto rebuild-db rebuild run-ticket run-user gen-swagger install-playwright redis asynq-management
 

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"strings"
+	"time"
 
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/crawler/domain"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/crawler/infrastructure/repository"
@@ -40,6 +41,9 @@ func (s *service) Get(ctx context.Context, arg *domain.WebSite) (*domain.Entry, 
 	// 	}()
 	// }
 	//TODO: Fix the defer close browser
+
+	// for i := 0; i < 10; i++ {
+	// 	go func() {
 	newPage, err := browser.NewPage()
 	if err != nil {
 		log.Error().Err(err).Msgf("could not create page: %v", err)
@@ -61,6 +65,10 @@ func (s *service) Get(ctx context.Context, arg *domain.WebSite) (*domain.Entry, 
 			}
 		})
 	})
+	time.Sleep(10 * time.Second)
+	newPage.Close()
+	// 	}()
+	// }
 
 	return &collection, nil
 }
