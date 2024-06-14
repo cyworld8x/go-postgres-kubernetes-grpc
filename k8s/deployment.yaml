@@ -1,0 +1,100 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-app-deployement  # Name of the deployment
+  labels:
+    app: user-app
+spec:
+  replicas: 1  # Number of pods to be created
+  selector:
+    matchLabels:
+      app: user-app
+  template:
+    metadata:
+      labels:
+        app: user-app
+    spec:
+      containers:
+      - name: user-app-container
+        image: phambchungdev/k8s-user-app  # Image name and version
+        ports:
+        - containerPort: 8080  # Port on which the application is running
+          name: http-server
+        - containerPort: 8081  # Port on which the grpc server is running
+          name: grpc-server
+        env:
+        - name: DB_SOURCE
+          value: postgresql://postgres:postgres@postgres-service.default:20241/socialdb?sslmode=disable
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "0.2"
+          limits:
+            memory: "512Mi"
+            cpu: "1"
+      # restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deployement  # Name of the deployment
+  labels:
+    app: redis
+spec:
+  replicas: 1  # Number of pods to be created
+  selector:
+    matchLabels:
+      app: redis
+  template:
+    metadata:
+      labels:
+        app: redis
+    spec:
+      containers:
+      - name: redis-container
+        image: redis:alpine  # Image name and version
+        ports:
+        - containerPort: 6379  # Port on which the application is running
+          name: redis-server
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "0.2"
+          limits:
+            memory: "512Mi"
+            cpu: "1"
+      # restartPolicy: Always
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-deployment  # Name of the deployment
+  labels:
+    app: postgres
+spec:
+  replicas: 1  # Number of pods to be created
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+      - name: postgres-container
+        image: postgres:alpine  # Image name and version
+        ports:
+        - containerPort: 5432  # Port on which the application is running
+          name: postgres-server        
+        envFrom:
+        - configMapRef:
+            name: postgres-secret
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "0.2"
+          limits:
+            memory: "512Mi"
+            cpu: "1"
+      # restartPolicy: Always

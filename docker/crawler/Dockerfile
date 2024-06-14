@@ -8,7 +8,7 @@ RUN go build -o crawler ./cmd/crawler/main.go
 FROM alpine:3.19
 WORKDIR /app
 COPY --from=builder /app/crawler .
-COPY cmd/crawler/config/app.env .
+COPY ./cmd/ticket/config ./cmd/ticket/config
 
 EXPOSE 8084
 CMD [ "/app/crawler" ]

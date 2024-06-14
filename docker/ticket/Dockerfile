@@ -8,7 +8,7 @@ RUN go build -o ticket ./cmd/ticket/main.go
 FROM alpine:3.19
 WORKDIR /app
 COPY --from=builder /app/ticket .
-COPY cmd/ticket/config/app.env .
+COPY ./cmd/ticket/config ./cmd/ticket/config
 
 EXPOSE 8082
 CMD [ "/app/ticket" ]

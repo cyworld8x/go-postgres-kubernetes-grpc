@@ -11,7 +11,7 @@ FROM alpine:3.19
 WORKDIR /app
 COPY --from=builder /app/main .
 COPY --from=builder /app/migrate.linux-amd64 ./migrate
-COPY cmd/user/config/app.env .
+COPY ./cmd/user/config ./cmd/user/config
 COPY start.sh .
 RUN chmod +x start.sh
 COPY wait-for.sh .
