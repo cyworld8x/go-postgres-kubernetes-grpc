@@ -16,38 +16,14 @@ spec:
       port: 8081
       targetPort: 8081
       name: grpc-server
-  type: LoadBalancer
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: ticket-app-service  # Name of the service
-  labels:
-    app: ticket-app
-spec:
-  selector:
-    app: ticket-app
-  ports:
     - protocol: TCP
-      port: 8082 #  port for incoming traffic
-      targetPort: 8082 # Port on which the application is running Service‘s pods
-      name: http-server
-  type: LoadBalancer
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: event-app-service  # Name of the service
-  labels:
-    app: event-app
-spec:
-  selector:
-    app: event-app
-  ports:
+      port: 8082
+      targetPort: 8082
+      name: ticket-server
     - protocol: TCP
-      port: 8083 #  port for incoming traffic
-      targetPort: 8083 # Port on which the application is running Service‘s pods
-      name: http-server
+      port: 8083
+      targetPort: 8083
+      name: event-server
   type: LoadBalancer
 ---
 apiVersion: v1

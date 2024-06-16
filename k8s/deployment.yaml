@@ -27,29 +27,11 @@ spec:
           value: postgresql://postgres:postgres@postgres-service.default:20241/socialdb?sslmode=disable
         resources:
           requests:
-            memory: "256Mi"
+            memory: "100Mi"
             cpu: "0.2"
           limits:
-            memory: "512Mi"
-            cpu: "0.5"    
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: ticket-app-deployement  # Name of the deployment
-  labels:
-    app: ticket-app
-spec:
-  replicas: 1  # Number of pods to be created
-  selector:
-    matchLabels:
-      app: ticket-app
-  template:
-    metadata:
-      labels:
-        app: ticket-app
-    spec:
-      containers:
+            memory: "256Mi"
+            cpu: "0.3"  
       - name: ticket-app-container
         image: phambchungdev/k8s-ticket-app  # Image name and version
         ports:
@@ -60,29 +42,11 @@ spec:
           value: postgresql://postgres:postgres@postgres-service.default:20241/socialdb?sslmode=disable
         resources:
           requests:
-            memory: "256Mi"
+            memory: "100Mi"
             cpu: "0.2"
           limits:
-            memory: "512Mi"
-            cpu: "0.5"    
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: event-app-deployement  # Name of the deployment
-  labels:
-    app: event-app
-spec:
-  replicas: 1  # Number of pods to be created
-  selector:
-    matchLabels:
-      app: event-app
-  template:
-    metadata:
-      labels:
-        app: event-app
-    spec:
-      containers:
+            memory: "256Mi"
+            cpu: "0.3"
       - name: event-app-container
         image: phambchungdev/k8s-event-app  # Image name and version
         imagePullPolicy: Always
@@ -94,11 +58,11 @@ spec:
           value: postgresql://postgres:postgres@postgres-service.default:20241/socialdb?sslmode=disable
         resources:
           requests:
-            memory: "128Mi"
+            memory: "100Mi"
             cpu: "0.2"
           limits:
-            memory: "512Mi"
-            cpu: "0.5"            
+            memory: "256Mi"
+            cpu: "0.3"     
 ---
 apiVersion: apps/v1
 kind: Deployment
