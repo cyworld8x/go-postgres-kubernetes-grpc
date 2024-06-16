@@ -8,7 +8,7 @@ RUN go build -o event ./cmd/event/main.go
 FROM alpine:3.19
 WORKDIR /app
 COPY --from=builder /app/event .
-COPY ./cmd/ticket/config ./cmd/ticket/config
+COPY ./cmd/event/config ./cmd/event/config
 
 EXPOSE 8083
 CMD [ "/app/event" ]

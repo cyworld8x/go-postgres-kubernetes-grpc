@@ -3,10 +3,10 @@ kind: Service
 metadata:
   name: user-app-service  # Name of the service
   labels:
-    app: user-app
+    app: app
 spec:
   selector:
-    app: user-app
+    app: app
   ports:
     - protocol: TCP
       port: 8080 #  port for incoming traffic
@@ -16,6 +16,54 @@ spec:
       port: 8081
       targetPort: 8081
       name: grpc-server
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticket-app-service  # Name of the service
+  labels:
+    app: ticket-app
+spec:
+  selector:
+    app: ticket-app
+  ports:
+    - protocol: TCP
+      port: 8082 #  port for incoming traffic
+      targetPort: 8082 # Port on which the application is running Service‘s pods
+      name: http-server
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: event-app-service  # Name of the service
+  labels:
+    app: event-app
+spec:
+  selector:
+    app: event-app
+  ports:
+    - protocol: TCP
+      port: 8083 #  port for incoming traffic
+      targetPort: 8083 # Port on which the application is running Service‘s pods
+      name: http-server
+  type: LoadBalancer
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crawler-app-service  # Name of the service
+  labels:
+    app: crawler-app
+spec:
+  selector:
+    app: crawler-app
+  ports:
+    - protocol: TCP
+      port: 8084 #  port for incoming traffic
+      targetPort: 8084 # Port on which the application is running Service‘s pods
+      name: http-server
   type: LoadBalancer
 ---
 apiVersion: v1
@@ -48,4 +96,24 @@ spec:
       port: 20241
       targetPort: 5432
       name: postgres-server
+  type: NodePort
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: rabitmq-service  # Name of the service
+  labels:
+    app: rabitmq
+spec:
+  selector:
+    app: rabitmq
+  ports:
+    - protocol: TCP
+      port: 15678
+      targetPort: 15672
+      name: rabitmq-management
+    - protocol: TCP
+      port: 5678
+      targetPort: 5672
+      name: rabitmq-server
   type: NodePort
