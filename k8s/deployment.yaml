@@ -89,6 +89,9 @@ spec:
         ports:
         - containerPort: 8083  # Port on which the grpc server is running
           name: http-server
+        env:
+        - name: DB_SOURCE
+          value: postgresql://postgres:postgres@postgres-service.default:20241/socialdb?sslmode=disable
         resources:
           requests:
             memory: "128Mi"
@@ -117,6 +120,9 @@ spec:
       - name: crawler-app-container
         image: phambchungdev/k8s-crawler-app  # Image name and version
         imagePullPolicy: Always
+        env:
+        - name: DB_SOURCE
+          value: postgresql://postgres:postgres@postgres-service.default:20241/socialdb?sslmode=disable
         ports:
         - containerPort: 8084  # Port on which the grpc server is running
           name: http-server
@@ -177,7 +183,8 @@ spec:
     spec:
       containers:
       - name: postgres-container
-        image: postgres:alpine  # Image name and version
+        image: postgres:16-alpine  # Image name and version
+        imagePullPolicy: Always
         ports:
         - containerPort: 5432  # Port on which the application is running
           name: postgres-server        
@@ -190,7 +197,7 @@ spec:
             cpu: "0.2"
           limits:
             memory: "512Mi"
-            cpu: "0.5"
+            cpu: "1"
       # restartPolicy: Always
 ---
 apiVersion: apps/v1
