@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: user-app-container
-        image: phambchungdev/k8s-user-app  # Image name and version
+        image: phambchungdev/k8s-user-app:1.1  # Image name and version
         ports:
         - containerPort: 8080  # Port on which the application is running
           name: http-server
@@ -33,7 +33,7 @@ spec:
             memory: "256Mi"
             cpu: "0.3"  
       - name: ticket-app-container
-        image: phambchungdev/k8s-ticket-app  # Image name and version
+        image: phambchungdev/k8s-ticket-app:1.1  # Image name and version
         ports:
         - containerPort: 8082  # Port on which the grpc server is running
           name: grpc-server
@@ -48,7 +48,7 @@ spec:
             memory: "256Mi"
             cpu: "0.3"
       - name: event-app-container
-        image: phambchungdev/k8s-event-app  # Image name and version
+        image: phambchungdev/k8s-event-app:1.1  # Image name and version
         imagePullPolicy: Always
         ports:
         - containerPort: 8083  # Port on which the grpc server is running
@@ -82,7 +82,7 @@ spec:
     spec:
       containers:
       - name: crawler-app-container
-        image: phambchungdev/k8s-crawler-app  # Image name and version
+        image: phambchungdev/k8s-crawler-app:1.1  # Image name and version
         imagePullPolicy: Always
         env:
         - name: DB_SOURCE
