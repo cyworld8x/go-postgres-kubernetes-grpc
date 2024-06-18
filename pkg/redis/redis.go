@@ -15,10 +15,19 @@ type RedisCache struct {
 	Configuration redis.Options
 }
 
-func New(options ...Option) *RedisCache {
+const (
+	// DefaultPoolSize is the default pool size
+	_network = "tcp"
+	_addr    = "localhost:6379"
+	_db      = 0
+)
+
+func New(connection string) *RedisCache {
 	c := &RedisCache{}
-	for _, option := range options {
-		option(c)
+	c.Configuration = redis.Options{
+		Network: _network,
+		Addr:    connection,
+		DB:      _db,
 	}
 	c.Client = redis.NewClient(&c.Configuration)
 	return c

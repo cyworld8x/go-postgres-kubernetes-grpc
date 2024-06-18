@@ -19,9 +19,10 @@ type User struct {
 func TestNewRedis(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
-	redisCache := redis.New(redis.WithAddress("localhost:6379"),
+	redisCache := redis.New("localhost:6379")
+
+	redisCache.Configure(
 		redis.WithDB(1),
-		redis.WithNetwork("tcp"),
 	)
 
 	defer redisCache.Client.Close()
@@ -38,7 +39,7 @@ func TestNewRedis(t *testing.T) {
 	publisher, err := redisCache.NewPublisher()
 	assert.Nil(t, err)
 
-	for i := 0; i < 2; i++ {
+	for i := 0; i < 20; i++ {
 		go func() {
 			user := User{
 				Name:  "Test User" + fmt.Sprint(i),
@@ -69,7 +70,7 @@ func TestNewRedis(t *testing.T) {
 
 	}()
 
-	time.Sleep(10 * time.Second)
+	time.Sleep(20 * time.Second)
 	if err != nil {
 		t.Errorf("Failed to subscribe messages: %v", err)
 	}
