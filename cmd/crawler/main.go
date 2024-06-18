@@ -8,6 +8,7 @@ import (
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/postgres"
 	"github.com/playwright-community/playwright-go"
 	"github.com/rs/zerolog/log"
+	"github.com/tmc/langchaingo/llms/openai"
 	"go.uber.org/automaxprocs/maxprocs"
 )
 
@@ -35,11 +36,16 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msgf("could not start playwright: %v", err)
 	}
-	app, err := api.Init(postgres.DBConnString(config.DbSource), pw)
+	llm, err := openai.New()
+	if err != nil {
+		log.Err(err).Err(err).Msgf("could not start openai: %v", err)
+	}
+
+	app, err := api.Init(postgres.DBConnString(config.DbSource), pw, llm)
 	app.Server.Start(config.HttpServerAddress)
 
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed start ticket API")
+		log.Fatal().Err(err).Msg("failed start crawler API")
 		pw.Stop()
 		cancel()
 		<-ctx.Done()

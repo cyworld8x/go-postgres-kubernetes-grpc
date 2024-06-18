@@ -4,6 +4,7 @@ import (
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/crawler/application/api/handler"
 	docs "github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/crawler/application/api/swagger/docs"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/crawler/usecases/crawler"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/crawler/usecases/prompt"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/crawler/usecases/sources"
 	"github.com/gin-gonic/gin"
 	swaggerfiles "github.com/swaggo/files"
@@ -14,6 +15,7 @@ import (
 type Server struct {
 	sourceUC  sources.UseCase
 	crawlerUC crawler.UseCase
+	promptUC  prompt.UseCase
 	Router    *gin.Engine
 }
 
@@ -36,11 +38,12 @@ type Server struct {
 
 // @externalDocs.description  OpenAPI
 // @externalDocs.url          https://swagger.io/resources/open-api/
-func NewServer(sourceUC sources.UseCase, crawlerUC crawler.UseCase) *Server {
+func NewServer(sourceUC sources.UseCase, crawlerUC crawler.UseCase, promptUC prompt.UseCase) *Server {
 
 	server := &Server{
 		sourceUC:  sourceUC,
 		crawlerUC: crawlerUC,
+		promptUC:  promptUC,
 	}
 
 	router := gin.Default()
@@ -48,6 +51,7 @@ func NewServer(sourceUC sources.UseCase, crawlerUC crawler.UseCase) *Server {
 	routerGroup := router.Group(docs.SwaggerInfo.BasePath)
 	handler.MakeSourceHandler(routerGroup, sourceUC)
 	handler.MakeCrawlerHandler(routerGroup, crawlerUC)
+	handler.MakePromptHandler(routerGroup, promptUC)
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerfiles.Handler))
 	server.Router = router
 	return server

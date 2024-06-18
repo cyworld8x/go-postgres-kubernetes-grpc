@@ -105,6 +105,35 @@ paths:
       summary: Crawl website
       tags:
       - Crawler
+  /prompt:
+    get:
+      consumes:
+      - application/json
+      description: exec a prompt
+      parameters:
+      - description: message
+        in: query
+        name: message
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+        "400":
+          description: Bad Request
+          schema: {}
+        "404":
+          description: Not Found
+          schema: {}
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: exec a prompt
+      tags:
+      - Prompt
   /sources:
     get:
       consumes:
