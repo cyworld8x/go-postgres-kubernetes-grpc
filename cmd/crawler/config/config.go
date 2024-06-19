@@ -8,6 +8,7 @@ type Config struct {
 	DbDriver          string `mapstructure:"DB_DRIVER"`
 	DbSource          string `mapstructure:"DB_SOURCE"`
 	HttpServerAddress string `mapstructure:"HTTP_SERVER_ADDRESS"`
+	PushGatewayURL    string `mapstructure:"PUSH_GATEWAY_URL"`
 }
 
 func Load() (config Config, err error) {

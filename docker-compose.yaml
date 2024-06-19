@@ -75,5 +75,31 @@ services:
       - postgres
     volumes:
       - data-volume:/app/data/crawler/data
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    container_name: grafana
+    network_mode: "bridge"
+    depends_on:
+      - prometheus
+      - prometheus-pushgateway
+  prometheus:
+    image: prom/prometheus     
+    ports:
+      - 9090:9090
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    volumes:
+      - ./misc/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    container_name: prometheus
+    network_mode: "bridge"
+  prometheus-pushgateway:
+    image: prom/pushgateway
+    container_name: pushgateway
+    expose:
+      - 9091
+    ports:
+      - "9091:9091"
 volumes:
   data-volume:

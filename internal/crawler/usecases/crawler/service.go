@@ -18,7 +18,7 @@ type service struct {
 	pw   *playwright.Playwright
 }
 
-func NewCrawlerHandler(repo repository.Repository, pw *playwright.Playwright) UseCase {
+func NewService(repo repository.Repository, pw *playwright.Playwright) UseCase {
 	return &service{
 		repo: repo,
 		pw:   pw,

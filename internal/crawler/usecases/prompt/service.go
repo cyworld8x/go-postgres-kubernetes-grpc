@@ -12,7 +12,7 @@ type service struct {
 	llm *openai.LLM
 }
 
-func NewPromptHandler(llm *openai.LLM) UseCase {
+func NewService(llm *openai.LLM) UseCase {
 	return &service{
 		llm: llm,
 	}

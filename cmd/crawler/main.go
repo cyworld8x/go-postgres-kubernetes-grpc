@@ -41,7 +41,7 @@ func main() {
 		log.Err(err).Err(err).Msgf("could not start openai: %v", err)
 	}
 
-	app, err := api.Init(postgres.DBConnString(config.DbSource), pw, llm)
+	app, err := api.Init(postgres.DBConnString(config.DbSource), config.PushGatewayURL, pw, llm)
 	app.Server.Start(config.HttpServerAddress)
 
 	if err != nil {
