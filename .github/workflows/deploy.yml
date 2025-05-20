@@ -20,5 +20,5 @@ jobs:
         key: ${{ secrets.EC2_PRIVATE_KEY }}
         port: ${{ secrets.EC2_PORT }}
         script: |
-          cd /home/asvaccount # Or your application path
+          cd /home/${{ secrets.EC2_USER }} # Or your application path
           ./deploy.sh
