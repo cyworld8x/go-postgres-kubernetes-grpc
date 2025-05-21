@@ -37,7 +37,7 @@ jobs:
           # Create the target directory
           sudo mkdir -p ${{ secrets.EC2_SOURCE_USER_API_FOLDER_PATH }}
           sudo mkdir -p ${{ secrets.EC2_SOURCE_USER_API_FOLDER_PATH }}/cmd/user/config
-          sudo chown $USER:$USER ${{ secrets.EC2_SOURCE_USER_API_FOLDER_PATH }}
+          sudo chown  ${{ secrets.EC2_USER }}: ${{ secrets.EC2_USER }} ${{ secrets.EC2_SOURCE_USER_API_FOLDER_PATH }}
 
           # Copy the new binary
           scp -o StrictHostKeyChecking=no $GITHUB_WORKSPACE/cmd/user/user-api ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:${{ secrets.EC2_SOURCE_USER_API_FOLDER_PATH}}/
