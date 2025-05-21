@@ -1,61 +1,24 @@
-name: Deploy Go App to EC2 (with systemd)
+name: Auto Blue/Green Deploy to EC2
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ] # Or your main branch name
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Set up Go
-      uses: actions/setup-go@v5
-      with:
-        go-version: '>=1.22'
-
-    - name: Build Go application
-      run: |
-        go build -o cmd/user/user-api cmd/user/main.go
-    - name: List Workspace Contents
-      run: ls -R $GITHUB_WORKSPACE
-    - name: SSH Deploy
+    - name: SSH and Deploy
       uses: appleboy/ssh-action@v1.0.0
       with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_PRIVATE_KEY }}
-        port: 22
+        port: ${{ secrets.EC2_PORT }}
         script: |
-          echo "Deploying to EC2 (using systemd)..."
-
-          # Stop the current service
-          sudo systemctl stop api.service || true # Ignore if it's not running
-
-          # Create the target directory
-          sudo mkdir -p ${{ secrets.EC2_SOURCE_USER_API_FOLDER_PATH }}
-          sudo mkdir -p ${{ secrets.EC2_SOURCE_USER_API_FOLDER_PATH }}/cmd/user/config
-          sudo chown  ec2-user:ec2-user /opt/api
-          sudo chown  ec2-user:ec2-user /opt/api/cmd/user/config
-
-
-          # Copy the new binary
-         
-          scp -o StrictHostKeyChecking=no $GITHUB_WORKSPACE/cmd/user/user-api ec2-user@ec2-54-179-218-57.ap-southeast-1.compute.amazonaws.com:/opt/api/
-          scp -o StrictHostKeyChecking=no $GITHUB_WORKSPACE/cmd/user/config/app.env ec2-user@ec2-54-179-218-57.ap-southeast-1.compute.amazonaws.com:/opt/api/cmd/user/config
-
-          echo "Binary copied to EC2"
-
-          # Update the systemd configuration
-          sudo systemctl daemon-reload
-
-          # Start the new service
-          sudo systemctl start api.service
-
-          echo "Application started via systemd"
-
-          # Optionally, check the status
-          sudo systemctl status api.service
+          cd /home/ec2-user
+          ./deploy.sh
