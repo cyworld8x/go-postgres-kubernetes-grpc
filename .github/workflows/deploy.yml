@@ -22,6 +22,11 @@ jobs:
         go build -o cmd/user/user-api cmd/user/main.go
     - name: List Workspace Contents
       run: ls -R $GITHUB_WORKSPACE
+    - name: Set up SSH key
+      run: |
+        sudo mkdir -p ~/.ssh
+        echo "${{ secrets.EC2_PRIVATE_KEY }}" | tr -d '\r' > ~/.ssh/id_rsa
+        sudo chmod 400 ~/.ssh/id_rsa
     - name: SSH Deploy
       uses: appleboy/ssh-action@v1.0.0
       with:
@@ -41,10 +46,11 @@ jobs:
           sudo chown  ec2-user:ec2-user /opt/api
           sudo chown  ec2-user:ec2-user /opt/api/cmd/user/config
 
+
           # Copy the new binary
          
-          scp -o StrictHostKeyChecking=no $GITHUB_WORKSPACE/cmd/user/user-api ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/api/
-          scp -o StrictHostKeyChecking=no $GITHUB_WORKSPACE/cmd/user/config/app.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/opt/api/cmd/user/config
+          scp -o StrictHostKeyChecking=no $GITHUB_WORKSPACE/cmd/user/user-api ec2-user@ec2-54-179-218-57.ap-southeast-1.compute.amazonaws.com:/opt/api/
+          scp -o StrictHostKeyChecking=no $GITHUB_WORKSPACE/cmd/user/config/app.env ec2-user@ec2-54-179-218-57.ap-southeast-1.compute.amazonaws.com:/opt/api/cmd/user/config
 
           echo "Binary copied to EC2"
 
