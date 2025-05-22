@@ -29,6 +29,7 @@ jobs:
           port: ${{ secrets.EC2_PORT }}
           script: |
             echo "Starting deployment..."
+            mkdir -p /home/ec2-user/app/config
             whoami
             ls -al
             echo "Deployment complete!"
