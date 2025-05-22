@@ -39,11 +39,9 @@ jobs:
 
             ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir -p $REMOTE_DIR"
 
-            scp $APP_NAME ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:$REMOTE_DIR/$APP_NAME/cmd/user/config
+            scp cmd/user/$APP_NAME ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:$REMOTE_DIR
 
-            scp cmd/user/$APP_NAME ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:$REMOTE_DIR/$APP_NAME
-
-            scp cmd/user/config/app.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:$REMOTE_DIR/$APP_NAME/cmd/user/config/app.env
+            scp cmd/user/config/app.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:$REMOTE_DIR/cmd/user/config
 
             # Example: Stop any running instance and then start the new one
             ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "pkill -f $APP_NAME && nohup $REMOTE_DIR/$APP_NAME &"
