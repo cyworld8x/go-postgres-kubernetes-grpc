@@ -18,13 +18,7 @@ jobs:
           go-version: '>=1.22' # Specify your Go version
 
       - name: Build
-        run: go build -o cmd/user/user-api  cmd/user/main.go # Adjust the output name if needed
-      - name: Debug Secrets
-        run: |
-          echo "EC2 Host: ${{ secrets.EC2_HOST }}"
-          echo "EC2 User: ${{ secrets.EC2_USER }}"
-          echo "Private Key Starts: $(echo "${{ secrets.EC2_PRIVATE_KEY }}" | head -n 2)"
-          echo "Private Key Ends: $(echo "${{ secrets.EC2_PRIVATE_KEY }}" | tail -n 2)"
+        run: go build -o cmd/user/user-api  cmd/user/main.go # Adjust the output name if needed     
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -37,9 +31,9 @@ jobs:
             APP_NAME=user-api
             REMOTE_DIR=/home/${{ secrets.EC2_USER }}/app
 
-            ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir -p $REMOTE_DIR"
+            ssh -o StrictHostKeyChecking=no ec2-user@ec2-54-179-218-57.ap-southeast-1.compute.amazonaws.com "mkdir -p $REMOTE_DIR"
 
-            scp cmd/user/$APP_NAME ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:$REMOTE_DIR
+            scp cmd/user/$APP_NAME ec2-user@ec2-54-179-218-57.ap-southeast-1.compute.amazonaws.com:/home/ec2-user
 
             scp cmd/user/config/app.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:$REMOTE_DIR/cmd/user/config
 
