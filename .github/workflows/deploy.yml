@@ -18,7 +18,7 @@ jobs:
           go-version: '>=1.22'
 
       - name: Build
-        run: go build -o user-api cmd/user/user-api.go
+        run: go build -o user-api cmd/user/main.go
 
       - name: SSH Deploy
         uses: appleboy/ssh-action@v1.0.0
