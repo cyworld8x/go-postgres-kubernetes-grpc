@@ -78,7 +78,7 @@ jobs:
             echo "Stopping and starting the application..."
             sudo systemctl stop $SERVICE_NAME
 
-            sudo scp -r $REMOTE_BUILD_DIR $REMOTE_APP_DIR 
+            sudo scp -r $REMOTE_BUILD_DIR/ $REMOTE_APP_DIR 
             echo "Reloading systemd daemon..."
             sudo systemctl daemon-reload
 
