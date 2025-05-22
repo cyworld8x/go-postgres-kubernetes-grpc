@@ -29,16 +29,6 @@ jobs:
           port: ${{ secrets.EC2_PORT }}
           script: |
             echo "Starting deployment..."
-            APP_NAME=user-api
-            REMOTE_DIR=/home/${{ secrets.EC2_USER }}/app
-
-            # Create remote directory if it doesn't exist
-            ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "mkdir -p $REMOTE_DIR"
-
-            # Copy the built executable
-            scp -o StrictHostKeyChecking=no $APP_NAME ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:$REMOTE_DIR/$APP_NAME
-
-            # Example: Stop and start the application (adjust as needed)
-            ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "pkill -f $APP_NAME && nohup $REMOTE_DIR/$APP_NAME &"
-
+            whoami
+            ls -al
             echo "Deployment complete!"
