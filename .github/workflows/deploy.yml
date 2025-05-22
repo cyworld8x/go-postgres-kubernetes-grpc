@@ -12,6 +12,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22' # Specify the Go version for your application
       - name: SSH and Build on EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
