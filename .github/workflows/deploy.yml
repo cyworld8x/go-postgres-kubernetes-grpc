@@ -24,7 +24,7 @@ jobs:
             APP_NAME=user-api
             REMOTE_REPO_DIR=/home/${{ secrets.EC2_USER }}/source # Directory to clone the repo
             REMOTE_BUILD_DIR=/home/${{ secrets.EC2_USER }}/build # Directory to build
-            REMOTE_APP_DIR=/home/${{ secrets.EC2_USER }}/app     # Directory to run the app
+            REMOTE_APP_DIR=/opt/app     # Directory to run the app
             GITHUB_REPOSITORY=https://github.com/cyworld8x/go-postgres-kubernetes-grpc.git
 
             # Ensure remote directories exist
@@ -49,15 +49,44 @@ jobs:
             cd $REMOTE_REPO_DIR/cmd/user
             go build -o $REMOTE_BUILD_DIR/$APP_NAME $REMOTE_REPO_DIR/cmd/user
             
-            scp -r $REMOTE_REPO_DIR/cmd/user/config/app.env $REMOTE_APP_DIR/cmd/user/config
-            scp -r $REMOTE_BUILD_DIR/$APP_NAME $REMOTE_APP_DIR
-            echo "Stopping and starting the application..."
-            sudo systemctl stop api.service
+            scp -r $REMOTE_REPO_DIR/cmd/user/config/app.env $REMOTE_BUILD_DIR/cmd/user/config
 
-            sudo scp -r $REMOTE_APP_DIR /opt/api
-            # Start the new service
+             # --- Setup Systemd Service ---
+            SERVICE_NAME=$APP_NAME.service
+            SERVICE_FILE=/etc/systemd/system/$SERVICE_NAME
+
+            echo "Creating systemd service file: $SERVICE_FILE"
+            sudo tee $SERVICE_FILE > /dev/null <<EOF
+            [Unit]
+            Description=Go User API Service
+            After=network.target
+
+            [Service]
+            User=${{ secrets.EC2_USER }}
+            WorkingDirectory=$REMOTE_APP_DIR
+            ExecStart=$REMOTE_APP_DIR/$APP_NAME
+            Restart=on-failure
+            RestartSec=5
+            StandardOutput=journal
+            StandardError=journal
+            SyslogIdentifier=$APP_NAME
+
+            [Install]
+            WantedBy=multi-user.target
+            EOF
+
+            echo "Stopping and starting the application..."
+            sudo systemctl stop $SERVICE_NAME
+
+            sudo scp -r $REMOTE_BUILD_DIR $REMOTE_APP_DIR 
+            echo "Reloading systemd daemon..."
             sudo systemctl daemon-reload
-            sudo systemctl start api.service
-            echo "Application started in the background."
+
+            echo "Enabling and starting the service: $SERVICE_NAME"
+            sudo systemctl enable $SERVICE_NAME
+            sudo systemctl start $SERVICE_NAME
+
+            echo "Checking service status..."
+            sudo systemctl status $SERVICE_NAME --no-pager # --no-pager prevents pagination
 
             echo "Deployment complete!"
