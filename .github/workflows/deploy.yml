@@ -22,7 +22,7 @@ jobs:
           script: |
             echo "Starting deployment..."
             APP_NAME=user-api
-            REMOTE_REPO_DIR=/home/${{ secrets.EC2_USER }}/repo # Directory to clone the repo
+            REMOTE_REPO_DIR=/home/${{ secrets.EC2_USER }}/source # Directory to clone the repo
             REMOTE_BUILD_DIR=/home/${{ secrets.EC2_USER }}/build # Directory to build
             REMOTE_APP_DIR=/home/${{ secrets.EC2_USER }}/app     # Directory to run the app
             GITHUB_REPOSITORY=https://github.com/cyworld8x/go-postgres-kubernetes-grpc.git
@@ -45,7 +45,9 @@ jobs:
             # Build the application
             echo "Building the application..."
             cd $REMOTE_REPO_DIR/cmd/user
-            go build -o $REMOTE_BUILD_DIR/$APP_NAME .
+            go build -o $REMOTE_BUILD_DIR/$APP_NAME $REMOTE_REPO_DIR/cmd/user
+            scp $REMOTE_REPO_DIR/cmd/user/config/app.env $REMOTE_APP_DIR/cmd/user/config
+            scp $REMOTE_BUILD_DIR/$APP_NAME $REMOTE_APP_DIR
 
             # Stop any running instance and start the new one
             echo "Stopping and starting the application..."
