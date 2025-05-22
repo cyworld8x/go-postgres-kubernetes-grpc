@@ -24,7 +24,7 @@ jobs:
             APP_NAME=user-api
             REMOTE_REPO_DIR=/home/${{ secrets.EC2_USER }}/source # Directory to clone the repo
             REMOTE_BUILD_DIR=/home/${{ secrets.EC2_USER }}/build # Directory to build
-            REMOTE_APP_DIR=/opt/app/build     # Directory to run the app
+            REMOTE_APP_DIR=/opt/app     # Directory to run the app
             GITHUB_REPOSITORY=https://github.com/cyworld8x/go-postgres-kubernetes-grpc.git
 
             # Ensure remote directories exist
@@ -63,8 +63,8 @@ jobs:
 
             [Service]
             User=${{ secrets.EC2_USER }}
-            WorkingDirectory=$REMOTE_APP_DIR
-            ExecStart=$REMOTE_APP_DIR/$APP_NAME
+            WorkingDirectory=$REMOTE_APP_DIR/build
+            ExecStart=$REMOTE_APP_DIR/build/$APP_NAME
             Restart=on-failure
             RestartSec=5
             StandardOutput=journal
