@@ -50,7 +50,7 @@ jobs:
             go build -o $REMOTE_BUILD_DIR/$APP_NAME $REMOTE_REPO_DIR/cmd/user
             
             scp -r $REMOTE_REPO_DIR/cmd/user/config/app.env $REMOTE_APP_DIR/cmd/user/config
-            scp -i $REMOTE_BUILD_DIR/$APP_NAME $REMOTE_APP_DIR
+            scp -r $REMOTE_BUILD_DIR/$APP_NAME $REMOTE_APP_DIR
             echo "Stopping and starting the application..."
             sudo systemctl stop api.service
 
