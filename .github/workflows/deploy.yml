@@ -11,8 +11,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 1 # Recommended for faster checkouts
 
-      - name: SSH and Build on EC2
+      - name: Set up environment variables
+        run: |
+          echo "APP_NAME=user-api" >> $GITHUB_ENV
+          echo "REMOTE_USER=${{ secrets.EC2_USER }}" >> $GITHUB_ENV
+          echo "REMOTE_REPO_DIR=/home/${{ env.REMOTE_USER }}/source" >> $GITHUB_ENV
+          echo "REMOTE_BUILD_DIR=/home/${{ env.REMOTE_USER }}/build" >> $GITHUB_ENV
+          echo "REMOTE_APP_DIR=/opt/app" >> $GITHUB_ENV
+          echo "GITHUB_REPOSITORY=https://github.com/cyworld8x/go-postgres-kubernetes-grpc.git" >> $GITHUB_ENV
+          echo "SERVICE_NAME=${{ env.APP_NAME }}.service" >> $GITHUB_ENV
+          echo "SERVICE_FILE=/etc/systemd/system/${{ env.SERVICE_NAME }}" >> $GITHUB_ENV
+        shell: bash
+
+      - name: SSH into EC2 and Prepare Directories
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -20,73 +34,109 @@ jobs:
           key: ${{ secrets.EC2_PRIVATE_KEY }}
           port: ${{ secrets.EC2_PORT }}
           script: |
-            echo "Starting deployment..."
-            APP_NAME=user-api
-            REMOTE_REPO_DIR=/home/${{ secrets.EC2_USER }}/source # Directory to clone the repo
-            REMOTE_BUILD_DIR=/home/${{ secrets.EC2_USER }}/build # Directory to build
-            REMOTE_APP_DIR=/opt/app     # Directory to run the app
-            GITHUB_REPOSITORY=https://github.com/cyworld8x/go-postgres-kubernetes-grpc.git
+            echo "--- Preparing Directories on EC2 ---"
+            echo "Ensuring build directory exists: ${{ env.REMOTE_BUILD_DIR }}"
+            sudo mkdir -p ${{ env.REMOTE_BUILD_DIR }}/cmd/user/config
+            echo "Ensuring application directory exists: ${{ env.REMOTE_APP_DIR }}"
+            sudo mkdir -p ${{ env.REMOTE_APP_DIR }}/build
+            echo "Directories prepared."
+        continue-on-error: true # Allow to continue if directories already exist
 
-            # Ensure remote directories exist
-            sudo scp -rfv $REMOTE_BUILD_DIR
-            sudo scp -rfv $REMOTE_APP_DIR
-            mkdir -p $REMOTE_REPO_DIR
-            mkdir -p $REMOTE_BUILD_DIR/cmd/user/config
-            sudo mkdir -p $REMOTE_APP_DIR
-
-            # Clone the repository (or pull if it exists)
-            if [ -d "$REMOTE_REPO_DIR/.git" ]; then
+      - name: SSH into EC2 and Clone/Pull Repository
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            echo "--- Cloning/Pulling Repository ---"
+            cd ${{ env.REMOTE_USER }}
+            if [ -d "${{ env.REMOTE_REPO_DIR }}/.git" ]; then
               echo "Repository already exists, pulling latest changes..."
-              cd $REMOTE_REPO_DIR
+              cd ${{ env.REMOTE_REPO_DIR }}
               git pull origin main
+              echo "Repository updated."
             else
               echo "Cloning repository..."
-              git clone --depth 1 $GITHUB_REPOSITORY $REMOTE_REPO_DIR
+              git clone --depth 1 ${{ env.GITHUB_REPOSITORY }} ${{ env.REMOTE_REPO_DIR }}
+              echo "Repository cloned."
             fi
 
-            # Build the application
-            echo "Building the application..."
-            cd $REMOTE_REPO_DIR/cmd/user
-            go build -o $REMOTE_BUILD_DIR/$APP_NAME $REMOTE_REPO_DIR/cmd/user
-            
-            cp $REMOTE_REPO_DIR/cmd/user/config/app.env $REMOTE_BUILD_DIR/cmd/user/config
+      - name: SSH into EC2 and Build Application
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            echo "--- Building Application ---"
+            echo "Navigating to build directory: ${{ env.REMOTE_REPO_DIR }}/cmd/user"
+            cd ${{ env.REMOTE_REPO_DIR }}/cmd/user
+            echo "Building Go application..."
+            go build -o ${{ env.REMOTE_BUILD_DIR }}/${{ env.APP_NAME }} .
+            echo "Build complete. Binary located at: ${{ env.REMOTE_BUILD_DIR }}/${{ env.APP_NAME }}"
+            echo "Copying configuration file..."
+            cp ${{ env.REMOTE_REPO_DIR }}/cmd/user/config/app.env ${{ env.REMOTE_BUILD_DIR }}/cmd/user/config
+            echo "Configuration file copied."
 
-             # --- Setup Systemd Service ---
-            SERVICE_NAME=$APP_NAME.service
-            SERVICE_FILE=/etc/systemd/system/$SERVICE_NAME
-
-            echo "Creating systemd service file: $SERVICE_FILE"
-            sudo tee $SERVICE_FILE > /dev/null <<EOF
+      - name: SSH into EC2 and Setup Systemd Service
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            echo "--- Setting up Systemd Service ---"
+            echo "Creating systemd service file: ${{ env.SERVICE_FILE }}"
+            sudo tee ${{ env.SERVICE_FILE }} > /dev/null <<EOF
             [Unit]
             Description=Go User API Service
             After=network.target
 
             [Service]
-            User=${{ secrets.EC2_USER }}
-            WorkingDirectory=$REMOTE_APP_DIR/build
-            ExecStart=$REMOTE_APP_DIR/build/$APP_NAME
+            User=${{ env.REMOTE_USER }}
+            WorkingDirectory=${{ env.REMOTE_APP_DIR }}/build
+            ExecStart=${{ env.REMOTE_APP_DIR }}/build/${{ env.APP_NAME }}
             Restart=on-failure
             RestartSec=5
             StandardOutput=journal
             StandardError=journal
-            SyslogIdentifier=$APP_NAME
+            SyslogIdentifier=${{ env.APP_NAME }}
 
             [Install]
             WantedBy=multi-user.target
             EOF
+            echo "Systemd service file created."
 
-            echo "Stopping and starting the application..."
-            sudo systemctl stop $SERVICE_NAME
+      - name: SSH into EC2 and Deploy and Manage Service
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            echo "--- Deploying and Managing Service ---"
+            echo "Stopping existing service (if running)..."
+            sudo systemctl stop ${{ env.SERVICE_NAME }} || true # Ignore if not running
 
-            sudo scp -r $REMOTE_BUILD_DIR $REMOTE_APP_DIR 
+            echo "Copying build output to application directory..."
+            sudo rm -rf ${{ env.REMOTE_APP_DIR }}/build/* # Clean previous build
+            sudo cp -r ${{ env.REMOTE_BUILD_DIR }}/* ${{ env.REMOTE_APP_DIR }}/build/
+            echo "Build output copied to ${{ env.REMOTE_APP_DIR }}/build/"
+
             echo "Reloading systemd daemon..."
             sudo systemctl daemon-reload
 
-            echo "Enabling and starting the service: $SERVICE_NAME"
-            sudo systemctl enable $SERVICE_NAME
-            sudo systemctl start $SERVICE_NAME
+            echo "Enabling service: ${{ env.SERVICE_NAME }}"
+            sudo systemctl enable ${{ env.SERVICE_NAME }}
+
+            echo "Starting service: ${{ env.SERVICE_NAME }}"
+            sudo systemctl start ${{ env.SERVICE_NAME }}
 
             echo "Checking service status..."
-            sudo systemctl status $SERVICE_NAME --no-pager # --no-pager prevents pagination
-
+            sudo systemctl status ${{ env.SERVICE_NAME }} --no-pager
             echo "Deployment complete!"
