@@ -25,6 +25,7 @@ jobs:
             REMOTE_REPO_DIR=/home/${{ secrets.EC2_USER }}/repo # Directory to clone the repo
             REMOTE_BUILD_DIR=/home/${{ secrets.EC2_USER }}/build # Directory to build
             REMOTE_APP_DIR=/home/${{ secrets.EC2_USER }}/app     # Directory to run the app
+            GITHUB_REPOSITORY=https://github.com/cyworld8x/go-postgres-kubernetes-grpc.git
 
             # Ensure remote directories exist
             mkdir -p $REMOTE_REPO_DIR
