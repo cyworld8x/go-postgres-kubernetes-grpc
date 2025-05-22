@@ -32,7 +32,7 @@ jobs:
             sudo scp -rfv $REMOTE_APP_DIR
             mkdir -p $REMOTE_REPO_DIR
             mkdir -p $REMOTE_BUILD_DIR
-            mkdir -p $REMOTE_APP_DIR
+            mkdir -p $REMOTE_APP_DIR/cmd/user/config
 
             # Clone the repository (or pull if it exists)
             if [ -d "$REMOTE_REPO_DIR/.git" ]; then
