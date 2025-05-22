@@ -46,13 +46,14 @@ jobs:
             echo "Building the application..."
             cd $REMOTE_REPO_DIR/cmd/user
             go build -o $REMOTE_BUILD_DIR/$APP_NAME $REMOTE_REPO_DIR/cmd/user
-            scp $REMOTE_REPO_DIR/cmd/user/config/app.env $REMOTE_APP_DIR/cmd/user/config
-            scp $REMOTE_BUILD_DIR/$APP_NAME $REMOTE_APP_DIR
-
-            # Stop any running instance and start the new one
+            scp -r -i $REMOTE_REPO_DIR/cmd/user/config/app.env $REMOTE_APP_DIR/cmd/user/config
+            scp -r -i $REMOTE_BUILD_DIR/$APP_NAME $REMOTE_APP_DIR
             echo "Stopping and starting the application..."
-            pkill -f $REMOTE_APP_DIR/$APP_NAME || true # Ignore if process not running
-            nohup $REMOTE_BUILD_DIR/$APP_NAME > $REMOTE_APP_DIR/output.log 2>&1 &
+            sudo systemctl stop api.service
+
+            sudo scp -r -i $REMOTE_BUILD_DIR /opt/api
+            # Start the new service
+            sudo systemctl start api.service
             echo "Application started in the background."
 
             echo "Deployment complete!"
