@@ -31,13 +31,6 @@ jobs:
             APP_NAME=user-api
             REMOTE_DIR=/home/${{ secrets.EC2_USER }}/app
 
-            ssh -o StrictHostKeyChecking=no ec2-user@ec2-54-179-218-57.ap-southeast-1.compute.amazonaws.com "mkdir -p $REMOTE_DIR"
-
             scp cmd/user/$APP_NAME ec2-user@ec2-54-179-218-57.ap-southeast-1.compute.amazonaws.com:/home/ec2-user
-
-            scp cmd/user/config/app.env ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:$REMOTE_DIR/cmd/user/config
-
-            # Example: Stop any running instance and then start the new one
-            ssh -o StrictHostKeyChecking=no ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "pkill -f $APP_NAME && nohup $REMOTE_DIR/$APP_NAME &"
 
             echo "Deployment complete!"
