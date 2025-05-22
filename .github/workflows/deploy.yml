@@ -1,4 +1,4 @@
-name: Deploy Go App to EC2
+name: Deploy Go App to EC2 (Build on EC2)
 
 on:
   push:
@@ -12,15 +12,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: '>=1.22'
-
-      - name: Build
-        run: go build -o user-api cmd/user/main.go
-
-      - name: SSH Deploy
+      - name: SSH and Build on EC2
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -29,7 +21,35 @@ jobs:
           port: ${{ secrets.EC2_PORT }}
           script: |
             echo "Starting deployment..."
-            mkdir -p /home/ec2-user/app/config
-            whoami
-            ls -al
+            APP_NAME=user-api
+            REMOTE_REPO_DIR=/home/${{ secrets.EC2_USER }}/repo # Directory to clone the repo
+            REMOTE_BUILD_DIR=/home/${{ secrets.EC2_USER }}/build # Directory to build
+            REMOTE_APP_DIR=/home/${{ secrets.EC2_USER }}/app     # Directory to run the app
+
+            # Ensure remote directories exist
+            mkdir -p $REMOTE_REPO_DIR
+            mkdir -p $REMOTE_BUILD_DIR
+            mkdir -p $REMOTE_APP_DIR
+
+            # Clone the repository (or pull if it exists)
+            if [ -d "$REMOTE_REPO_DIR/.git" ]; then
+              echo "Repository already exists, pulling latest changes..."
+              cd $REMOTE_REPO_DIR
+              git pull origin main
+            else
+              echo "Cloning repository..."
+              git clone --depth 1 $GITHUB_REPOSITORY $REMOTE_REPO_DIR
+            fi
+
+            # Build the application
+            echo "Building the application..."
+            cd $REMOTE_REPO_DIR/cmd/user
+            go build -o $REMOTE_BUILD_DIR/$APP_NAME .
+
+            # Stop any running instance and start the new one
+            echo "Stopping and starting the application..."
+            pkill -f $REMOTE_APP_DIR/$APP_NAME || true # Ignore if process not running
+            nohup $REMOTE_BUILD_DIR/$APP_NAME > $REMOTE_APP_DIR/output.log 2>&1 &
+            echo "Application started in the background."
+
             echo "Deployment complete!"
