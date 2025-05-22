@@ -32,7 +32,7 @@ jobs:
             sudo scp -rfv $REMOTE_APP_DIR
             mkdir -p $REMOTE_REPO_DIR
             mkdir -p $REMOTE_BUILD_DIR/cmd/user/config
-            mkdir -p $REMOTE_APP_DIR
+            sudo mkdir -p $REMOTE_APP_DIR
 
             # Clone the repository (or pull if it exists)
             if [ -d "$REMOTE_REPO_DIR/.git" ]; then
@@ -78,7 +78,7 @@ jobs:
             echo "Stopping and starting the application..."
             sudo systemctl stop $SERVICE_NAME
 
-            sudo scp -avr $REMOTE_BUILD_DIR $REMOTE_APP_DIR 
+            sudo scp -r $REMOTE_BUILD_DIR $REMOTE_APP_DIR 
             echo "Reloading systemd daemon..."
             sudo systemctl daemon-reload
 
