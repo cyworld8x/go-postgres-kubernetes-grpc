@@ -44,7 +44,7 @@ func main() {
 
 	//Start gRPC server
 
-	_, err = grpcserver.Init(postgres.DBConnString(config.DbSource), server)
+	_, err = grpcserver.Init(postgres.DBConnString(config.DbSource), config.DynamoDBEndPoint, server)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed init app")
 		cancel()
@@ -81,7 +81,7 @@ func main() {
 func startUserAPIServer(config configuration.Config) {
 	//Start API
 
-	app, err := api.Init(postgres.DBConnString(config.DbSource))
+	app, err := api.Init(postgres.DBConnString(config.DbSource), config.DynamoDBEndPoint)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed init app")
 	}

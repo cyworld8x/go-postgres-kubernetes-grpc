@@ -32,6 +32,12 @@ services:
     ports:
       - "15677:15672"
       - "5677:5672"
+  dynamodb:
+    container_name: dynamodb
+    image: amazon/dynamodb-local
+    ports:
+      - "8000:8000"
+    command: "-jar DynamoDBLocal.jar -sharedDb"
   user-app:
     container_name: user-app
     build:

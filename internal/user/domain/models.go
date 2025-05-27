@@ -20,7 +20,20 @@ const (
 )
 
 type User struct {
-	ID          uuid.UUID      `json:"id"`
+	ID          uuid.UUID      `json:"ID"`
+	Code        string         `json:"code"`
+	Username    string         `json:"username"`
+	DisplayName sql.NullString `json:"display_name"`
+	Password    string         `json:"password"`
+	Email       sql.NullString `json:"email"`
+	Status      bool           `json:"status"`
+	Role        string          `json:"role"`
+	Created     time.Time      `json:"created"`
+	Updated     time.Time      `json:"updated"`
+}
+
+type RawUser struct {
+	ID          string      `json:"ID"`
 	Code        string         `json:"code"`
 	Username    string         `json:"username"`
 	DisplayName sql.NullString `json:"display_name"`

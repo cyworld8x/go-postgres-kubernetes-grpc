@@ -20,6 +20,8 @@ func MakeUserHandler(router gin.IRouter, uc users.UseCase) {
 	pasetoMaker, _ := paseto.NewPasetoMaker()
 	authRoutes := router.Group("/").Use(middleware.AuthMiddleware(pasetoMaker))
 	authRoutes.GET("/user/:id", getUser(uc))
+	authRoutes.PUT("/user/:id", changePassword(uc))
+	authRoutes.DELETE("/user/:id", deleteUser(uc))
 }
 func createUser(service users.UseCase) gin.HandlerFunc {
 	// Add your code logic here
@@ -50,13 +52,13 @@ func getLogin(uc users.UseCase) gin.HandlerFunc {
 
 		user, err := uc.GetLogin(ctx, req.Username)
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, "User name doesn't match")
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "User doesn't exist"})
 			return
 		}
 
 		err = utils.CheckPassword(req.Password, user.Password)
 		if err != nil {
-			ctx.JSON(http.StatusUnauthorized, "Can't login with user name and password.")
+			ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Can't login with user name and password."})
 			return
 		}
 
@@ -87,10 +89,55 @@ func getUser(service users.UseCase) gin.HandlerFunc {
 		}
 		user, err := service.GetUser(ctx, id)
 		if err != nil {
-			ctx.JSON(http.StatusOK, "User doesn't exist")
+			ctx.JSON(http.StatusOK, gin.H{"message": "User doesn't exist"})
 			return
 		}
 		ctx.JSON(http.StatusOK, user)
+	})
+
+}
+
+func changePassword(service users.UseCase) gin.HandlerFunc {
+	// Add your code logic here
+	return gin.HandlerFunc(func(ctx *gin.Context) {
+
+		var req domain.UserLogin
+		if err := ctx.ShouldBindJSON(&req); err != nil {
+			ctx.JSON(http.StatusBadRequest, nil)
+			return
+		}
+
+		id, err := uuid.Parse(ctx.Param("id"))
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, err)
+			return
+		}
+		err = service.ChangePassword(ctx, id, req.Username, req.Password)
+		if err != nil {
+			ctx.JSON(http.StatusOK, gin.H{"message": "Can't change password"})
+
+			return
+		}
+		ctx.JSON(http.StatusOK, gin.H{"message": "Password changed successfully"})
+	})
+
+}
+
+func deleteUser(service users.UseCase) gin.HandlerFunc {
+	// Add your code logic here
+	return gin.HandlerFunc(func(ctx *gin.Context) {
+
+		id, err := uuid.Parse(ctx.Param("id"))
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, err)
+			return
+		}
+		err = service.DeleteUser(ctx, id)
+		if err != nil {
+			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Can't delete user successfully. Error:" + err.Error()})
+			return
+		}
+		ctx.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
 	})
 
 }

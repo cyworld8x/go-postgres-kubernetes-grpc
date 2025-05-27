@@ -198,8 +198,8 @@ func TestGetLogin(t *testing.T) {
 func newTestServer(t *testing.T) (*api.Server, error) {
 
 	dbSource := "postgresql://postgres:postgres@localhost:20241/socialdb?sslmode=disable"
-
-	app, err := api.Init(pg.DBConnString(dbSource))
+	dynamodbEndpoint := "http://localhost:8000"
+	app, err := api.Init(pg.DBConnString(dbSource), dynamodbEndpoint)
 	if err != nil {
 		t.Fatalf("failed to init app: %v", err)
 	}

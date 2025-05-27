@@ -9,7 +9,8 @@ asynq-management:
     --name asynqmon \
     -p 8080:8080 \
     hibiken/asynqmon:latest --redis-addr=host.docker.internal:6379\
-
+dynamodb:
+	docker run --rm --name dynamodb -p 8000:8000 -d amazon/dynamodb-local
 stoppostgres:
 	docker rm postgres
 createdb:

@@ -43,7 +43,7 @@ func TestCreate(t *testing.T) {
 		Times(1).
 		Return(*dbUser, nil)
 
-	m := NewService(userRepository)
+	m := NewService(userRepository, nil)
 	u := user
 	_, err := m.CreateUser(context.Background(), u.Username, u.Email.String, u.DisplayName.String, u.Password, u.Role)
 	assert.Nil(t, err)

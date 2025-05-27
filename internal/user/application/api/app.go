@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/infrastructure/repository"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/infrastructure/repository/dynamo"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/usecases/users"
+	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/dynamodb"
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/pkg/postgres"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -26,11 +28,19 @@ func New(
 
 func Init(
 	dbConnStr postgres.DBConnString,
+	dynamoEndPoint string,
 ) (*App, error) {
 
 	connPool, _ := pgxpool.New(context.Background(), string(dbConnStr))
 	repository := repository.NewRepository(connPool)
-	uc := users.NewService(repository)
+	dbClient, err := dynamodb.NewDynamoDB(dynamoEndPoint)
+	if err != nil {
+		return nil, err
+	}
+
+	dynamoDB := dynamo.NewUserRepository(dbClient.GetDB())
+
+	uc := users.NewService(repository, dynamoDB)
 	apiServer := NewServer(uc)
 	app := New(apiServer)
 	return app, nil

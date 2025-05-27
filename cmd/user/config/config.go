@@ -9,6 +9,7 @@ type Config struct {
 	DbSource          string `mapstructure:"DB_SOURCE"`
 	HttpServerAddress string `mapstructure:"HTTP_SERVER_ADDRESS"`
 	GRPCServerAddress string `mapstructure:"GRPC_SERVER_ADDRESS"`
+	DynamoDBEndPoint  string `mapstructure:"DYNAMODB_ENDPOINT"`
 }
 
 func Load() (config Config, err error) {
