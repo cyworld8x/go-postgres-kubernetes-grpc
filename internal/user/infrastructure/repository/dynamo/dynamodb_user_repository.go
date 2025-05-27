@@ -250,10 +250,14 @@ func (r *DynamoDBRepository) DeleteUser(ctx context.Context, id string) error {
 		},
 	}
 
-	_, err = r.db.DeleteItemWithContext(ctx, deleteItemInput)
+	deleteItemOut, err := r.db.DeleteItemWithContext(ctx, deleteItemInput)
 	if err != nil {
 		log.Error().Err(err).Msg("failed to delete user from DynamoDB")
 		return err
 	}
+	if deleteItemInput.ReturnValues != nil && *deleteItemInput.ReturnValues == "ALL_OLD" {
+		log.Info().Msgf("Deleted user: %v", deleteItemOut.Attributes)
+	} 
+
 	return nil
 }

@@ -22,9 +22,15 @@ type dynamo struct {
 
 func NewDynamoDB(endpoint string) (*dynamo, error) {
 	c := &dynamo{}
-	c.Configuration = &aws.Config{
-		Region:   aws.String(_region),
-		Endpoint: aws.String(endpoint),
+	if endpoint == "" {
+		c.Configuration = &aws.Config{
+			Region: aws.String(_region),
+		}
+	} else {
+		c.Configuration = &aws.Config{
+			Region:   aws.String(_region),
+			Endpoint: aws.String(endpoint),
+		}
 	}
 
 	sess, err := session.NewSession(c.Configuration)
