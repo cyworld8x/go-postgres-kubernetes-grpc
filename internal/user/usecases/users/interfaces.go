@@ -2,6 +2,7 @@ package users
 
 import (
 	"context"
+	"time"
 
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/domain"
 	"github.com/google/uuid"
@@ -14,4 +15,5 @@ type UseCase interface {
 	ChangePassword(ctx context.Context, id uuid.UUID, username string, password string) error
 	GetUser(ctx context.Context, Id uuid.UUID) (domain.User, error)
 	DeleteUser(ctx context.Context, Id uuid.UUID) error
+	GenerateSession(ctx context.Context, username string, token string, duration time.Duration) error
 }

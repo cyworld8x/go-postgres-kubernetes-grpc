@@ -66,3 +66,11 @@ type UserAccount struct {
 	Token	   string         `json:"token"`
 }
 
+type Session struct {
+	ID           string  `json:"id"`
+	Username     string    `json:"username"`
+	Token 		 string    `json:"token"`
+	IsBlocked    bool      `json:"is_blocked"`
+	ExpiresAt    int64 `json:"expires_at"`
+}
+

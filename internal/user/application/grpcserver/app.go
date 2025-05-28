@@ -43,8 +43,9 @@ func Init(
 	if err != nil {
 		return nil, err
 	}
-	dynamoDB := dynamo.NewUserRepository(dbClient.GetDB())
-	uc := users.NewService(repository, dynamoDB)
+	dynamoDB := dynamo.UserDynamoDBRepository(dbClient.GetDB())
+	sessionRepo := dynamo.SessionRepository(dbClient.GetDB())
+	uc := users.NewService(repository, dynamoDB, sessionRepo)
 	server := NewServer(grpcServer, uc)
 	app := New(uc, server)
 

@@ -7,6 +7,7 @@ package mock
 import (
 	context "context"
 	reflect "reflect"
+	time "time"
 
 	domain "github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/domain"
 	gomock "github.com/golang/mock/gomock"
@@ -36,8 +37,22 @@ func (m *MockUseCase) EXPECT() *MockUseCaseMockRecorder {
 	return m.recorder
 }
 
+// ChangePassword mocks base method.
+func (m *MockUseCase) ChangePassword(ctx context.Context, id uuid.UUID, username, password string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ChangePassword", ctx, id, username, password)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// ChangePassword indicates an expected call of ChangePassword.
+func (mr *MockUseCaseMockRecorder) ChangePassword(ctx, id, username, password interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ChangePassword", reflect.TypeOf((*MockUseCase)(nil).ChangePassword), ctx, id, username, password)
+}
+
 // CreateUser mocks base method.
-func (m *MockUseCase) CreateUser(ctx context.Context, username, email, displayName, password string, role int) (domain.User, error) {
+func (m *MockUseCase) CreateUser(ctx context.Context, username, email, displayName, password, role string) (domain.User, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "CreateUser", ctx, username, email, displayName, password, role)
 	ret0, _ := ret[0].(domain.User)
@@ -49,6 +64,34 @@ func (m *MockUseCase) CreateUser(ctx context.Context, username, email, displayNa
 func (mr *MockUseCaseMockRecorder) CreateUser(ctx, username, email, displayName, password, role interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "CreateUser", reflect.TypeOf((*MockUseCase)(nil).CreateUser), ctx, username, email, displayName, password, role)
+}
+
+// DeleteUser mocks base method.
+func (m *MockUseCase) DeleteUser(ctx context.Context, Id uuid.UUID) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DeleteUser", ctx, Id)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// DeleteUser indicates an expected call of DeleteUser.
+func (mr *MockUseCaseMockRecorder) DeleteUser(ctx, Id interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeleteUser", reflect.TypeOf((*MockUseCase)(nil).DeleteUser), ctx, Id)
+}
+
+// GenerateSession mocks base method.
+func (m *MockUseCase) GenerateSession(ctx context.Context, username, token string, duration time.Duration) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GenerateSession", ctx, username, token, duration)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+// GenerateSession indicates an expected call of GenerateSession.
+func (mr *MockUseCaseMockRecorder) GenerateSession(ctx, username, token, duration interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GenerateSession", reflect.TypeOf((*MockUseCase)(nil).GenerateSession), ctx, username, token, duration)
 }
 
 // GetLogin mocks base method.

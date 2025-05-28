@@ -67,6 +67,13 @@ func getLogin(uc users.UseCase) gin.HandlerFunc {
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, err)
 		}
+
+		err = uc.GenerateSession(ctx, user.Username, token, time.Hour)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{"message": "Can't generate session"})
+			return
+		}
+
 		ctx.JSON(http.StatusOK, &domain.UserAccount{
 			Username:    user.Username,
 			Email:       user.Email.String,

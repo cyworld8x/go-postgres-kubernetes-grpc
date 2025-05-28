@@ -12,14 +12,16 @@ import (
 )
 
 type service struct {
-	postgresDB domain.UserRepository
-	dynamoDB   domain.DynamoDBRepository
+	postgresDB  domain.UserRepository
+	userRepo    domain.UserDynamoDBRepository
+	sessionRepo domain.SessionRepository
 }
 
-func NewService(repo domain.UserRepository, dynamoDB domain.DynamoDBRepository) UseCase {
+func NewService(repo domain.UserRepository, userRepo domain.UserDynamoDBRepository, sessionRepo domain.SessionRepository) UseCase {
 	return &service{
-		postgresDB: repo,
-		dynamoDB:   dynamoDB,
+		postgresDB:  repo,
+		userRepo:    userRepo,
+		sessionRepo: sessionRepo,
 	}
 }
 
@@ -57,7 +59,7 @@ func (s *service) CreateUser(ctx context.Context, username string, email string,
 		Created:     now,
 		Updated:     now,
 	}
-	err = s.dynamoDB.CreateUser(ctx, &dynamouser)
+	err = s.userRepo.CreateUser(ctx, &dynamouser)
 	if err != nil {
 		log.Error().Err(err).Msg("Error creating user")
 		return domain.User{}, err
@@ -83,7 +85,7 @@ func (s *service) GetLogin(ctx context.Context, username string) (domain.User, e
 	// 	Created:     dbUser.Created.Time,
 	// 	Updated:     dbUser.Updated.Time,
 	// }, nil
-	dbUser, err := s.dynamoDB.GetLogin(ctx, username)
+	dbUser, err := s.userRepo.GetLogin(ctx, username)
 	if err != nil {
 		log.Error().Err(err).Msg("Error get login user")
 		return domain.User{}, err
@@ -105,7 +107,7 @@ func (s *service) GetLogin(ctx context.Context, username string) (domain.User, e
 func (s *service) GetUser(ctx context.Context, id uuid.UUID) (domain.User, error) {
 	//dbUser, err := s.postgresDB.GetUser(ctx, id)
 
-	dbUser, err := s.dynamoDB.GetUser(ctx, id.String())
+	dbUser, err := s.userRepo.GetUser(ctx, id.String())
 	if err != nil {
 		log.Error().Err(err).Msg("Error get login user")
 		return domain.User{}, err
@@ -135,7 +137,7 @@ func (s *service) ChangePassword(ctx context.Context, id uuid.UUID, username str
 	// 	log.Error().Err(err).Msg("Error change password")
 	// 	return err
 	// }
-	err = s.dynamoDB.ChangePassword(ctx, id.String(), username, pwdhash)
+	err = s.userRepo.ChangePassword(ctx, id.String(), username, pwdhash)
 	if err != nil {
 		log.Error().Err(err).Msg("Error change password")
 		return err
@@ -146,10 +148,23 @@ func (s *service) ChangePassword(ctx context.Context, id uuid.UUID, username str
 // GetLogin implements UseCase.
 func (s *service) DeleteUser(ctx context.Context, id uuid.UUID) error {
 
-	err := s.dynamoDB.DeleteUser(ctx, id.String())
+	err := s.userRepo.DeleteUser(ctx, id.String())
 	if err != nil {
 		log.Error().Err(err).Msg("Error delete user")
 		return err
 	}
+	return nil
+}
+
+// GenerateSession implements UseCase.
+func (s *service) GenerateSession(ctx context.Context, username string, token string, duration time.Duration) error {
+	session, err := s.sessionRepo.GenerateSession(ctx, username, token, duration)
+	if err != nil {
+		log.Error().Err(err).Msg("Error generating session")
+		return err
+	}
+
+	// Optionally, you can log the session creation or return the session object
+	log.Info().Str("session_id", session.ID).Msg("Session created successfully")
 	return nil
 }

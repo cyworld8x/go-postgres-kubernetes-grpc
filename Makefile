@@ -31,11 +31,12 @@ sqlc:
 mock:
 	@go get github.com/golang/mock/gomock
 	@go install github.com/golang/mock/mockgen	
-	mockgen -source=usecase/user/interface.go -destination=usecase/user/mock/user.go -package=mock
 	mockgen -source=internal/user/usecases/users/interfaces.go -destination=internal/user/usecases/users/mock/service.go -package=mock
-	mockgen -source=internal/user/domain/interfaces.go -destination=internal/user/domain/mock/userrepository.go -package=mock
-	mockgen -package mockdb -destination=db/mock/store.go github.com/cyworld8x/go-postgres-kubernetes-grpc/db/sqlc Store
-
+	mockgen -source=internal/user/domain/interfaces.go -destination=internal/user/domain/mock/repository.go -package=mock
+	mockgen -source=internal/user/usecases/sessions/interfaces.go -destination=internal/user/usecases/sessions/mock/service.go -package=mock
+	mockgen -source=internal/user/usecases/users/interfaces.go -destination=internal/user/usecases/users/mock/service.go -package=mock
+	mockgen -source=internal/user/infrastructure/repository/postgres -destination=internal/user/infrastructure/repository/mock -package=mock
+	
 test: 
 	go test -v -cover ./...  ./.... -coverprofile cover.out ./coverage/..
 	go tool cover -html cover.out -o ./coverage/cover.html

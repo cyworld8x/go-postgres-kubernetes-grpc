@@ -19,7 +19,7 @@ const (
 )
 
 // NewDynamoDBRepository creates a new instance of DynamoDBRepository.
-func NewUserRepository(db *dynamodb.DynamoDB) *DynamoDBRepository {
+func UserDynamoDBRepository(db *dynamodb.DynamoDB) *DynamoDBRepository {
 	// Check if the table exists
 	_, err := db.DescribeTable(&dynamodb.DescribeTableInput{
 		TableName: aws.String(_tableName),
@@ -257,7 +257,7 @@ func (r *DynamoDBRepository) DeleteUser(ctx context.Context, id string) error {
 	}
 	if deleteItemInput.ReturnValues != nil && *deleteItemInput.ReturnValues == "ALL_OLD" {
 		log.Info().Msgf("Deleted user: %v", deleteItemOut.Attributes)
-	} 
+	}
 
 	return nil
 }
