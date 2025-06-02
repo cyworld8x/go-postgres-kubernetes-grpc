@@ -1,23 +1,32 @@
-# Build stage
-FROM golang:1.22-alpine3.19 AS builder
+# --- Build stage ---
+FROM golang:1.24-alpine3.21 AS builder
+
 WORKDIR /app
+
+# Only copy go.mod and go.sum first to leverage Docker cache
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy the rest of the source code
 COPY . .
-RUN go build -o main cmd/user/main.go
-RUN apk add --no-cache curl
-RUN  curl -L https://github.com/golang-migrate/migrate/releases/download/v4.12.2/migrate.linux-amd64.tar.gz | tar xvz
 
-# Run stage
-FROM alpine:3.19
+# Build the Go binary statically for a minimal final image
+RUN CGO_ENABLED=0 GOOS=linux go build -o user ./cmd/user/main.go
+
+# --- Run stage ---
+FROM alpine:3.21
+
 WORKDIR /app
-COPY --from=builder /app/main .
-COPY --from=builder /app/migrate.linux-amd64 ./migrate
-COPY ./cmd/user/config ./cmd/user/config
-COPY start.sh .
-RUN chmod +x start.sh
-COPY wait-for.sh .
-RUN chmod +x  wait-for.sh
-COPY misc/db/postgres/migration ./migration
 
-EXPOSE 8080
-CMD [ "/app/main" ]
-ENTRYPOINT [ "/app/start.sh" ]
+# Only copy the built binary and necessary config
+COPY --from=builder /app/user .
+COPY ./cmd/user/config ./cmd/user/config
+
+# Ensure the binary has execution permissions (if needed)
+RUN chmod +x /app/user
+
+# Expose the port
+EXPOSE 5004
+
+# Set the entrypoint
+ENTRYPOINT ["/app/user"]

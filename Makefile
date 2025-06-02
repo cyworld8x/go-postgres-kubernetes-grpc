@@ -34,7 +34,6 @@ mock:
 	mockgen -source=internal/user/usecases/users/interfaces.go -destination=internal/user/usecases/users/mock/service.go -package=mock
 	mockgen -source=internal/user/domain/interfaces.go -destination=internal/user/domain/mock/repository.go -package=mock
 	mockgen -source=internal/user/usecases/sessions/interfaces.go -destination=internal/user/usecases/sessions/mock/service.go -package=mock
-	mockgen -source=internal/user/usecases/users/interfaces.go -destination=internal/user/usecases/users/mock/service.go -package=mock
 	mockgen -source=internal/user/infrastructure/repository/postgres -destination=internal/user/infrastructure/repository/mock -package=mock
 	
 test: 
@@ -60,5 +59,5 @@ run-crawler-api:
 	go run cmd/crawler/main.go
 run-user:
 	go run cmd/user/main.go
-.PHONY: postgres stoppostgres createdb dropdb migrateup migratedown sqlc test server mock proto rebuild-db rebuild run-ticket run-user gen-swagger install-playwright redis asynq-management
+.PHONY: postgres stoppostgres createdb dropdb migrateup migratedown sqlc test server mock proto rebuild-db rebuild run-ticket run-user gen-swagger install-playwright redis asynq-management dynamodb
 

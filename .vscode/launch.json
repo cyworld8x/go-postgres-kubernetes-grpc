@@ -1,12 +1,13 @@
 {
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "Debug User API",
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}\\cmd\\user\\main.go",
+            "program": "${workspaceFolder}/cmd/user/main.go",
             "env": {},
             "cwd": "${workspaceFolder}",
             "args": []
@@ -16,7 +17,7 @@
             "type": "go",
             "request": "launch",
             "mode": "auto",
-            "program": "${workspaceFolder}\\crawler\\user\\main.go",
+            "program": "${workspaceFolder}\\cmd\\crawler\\main.go",
             "env": {},
             "cwd": "${workspaceFolder}",
             "args": []

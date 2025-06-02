@@ -28,5 +28,7 @@ type (
 		GetSessionByUserID(ctx context.Context, username string) ([]*Session, error)
 		BlockSession(ctx context.Context, sessionID string) (bool, error)
 		GenerateSession(ctx context.Context, username string, token string, duration time.Duration) (*Session, error)
+		UnblockSession(ctx context.Context, sessionID string) (bool, error)
+		ClearSession(ctx context.Context, token string, username string) error
 	}
 )

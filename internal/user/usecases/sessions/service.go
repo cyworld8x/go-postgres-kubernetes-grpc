@@ -53,3 +53,13 @@ func (s *Service) BlockSession(ctx context.Context, sessionID string) (bool, err
 func (s *Service) GenerateSession(ctx context.Context, username string, token string, duration time.Duration) (*domain.Session, error) {
 	return s.sessionRepository.GenerateSession(ctx, username, token, duration)
 }
+
+// UnblockSession unblocks a session by its ID
+func (s *Service) UnblockSession(ctx context.Context, sessionID string) (bool, error) {
+	return s.sessionRepository.UnblockSession(ctx, sessionID)
+}
+
+// ClearSession clears a session by its token
+func (s *Service) ClearSession(ctx context.Context, token string, username string) error {
+	return s.sessionRepository.ClearSession(ctx, token, username)
+}

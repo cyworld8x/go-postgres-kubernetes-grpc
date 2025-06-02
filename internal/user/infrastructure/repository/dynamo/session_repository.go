@@ -3,6 +3,7 @@ package dynamo
 import (
 	"context"
 	"errors"
+	"strconv"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -254,4 +255,52 @@ func (r *DynamoDBRepository) GenerateSession(ctx context.Context, username strin
 	}
 
 	return session, nil
+}
+
+func (r *DynamoDBRepository) ClearSession(ctx context.Context, token string, username string) error {
+	input := &dynamodb.ScanInput{
+		TableName:        aws.String(r.tableName),
+		FilterExpression: aws.String("#tk = :token AND username = :username"),
+		ExpressionAttributeNames: map[string]*string{
+			"#tk": aws.String("token"),
+		},
+		ExpressionAttributeValues: map[string]*dynamodb.AttributeValue{
+			":token":    {S: aws.String(token)},
+			":username": {S: aws.String(username)},
+		},
+	}
+
+	result, err := r.db.ScanWithContext(ctx, input)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to clear session")
+		return err
+	}
+	if len(result.Items) == 0 {
+		log.Info().Msg("No session found to clear")
+		return errors.New("no session found to clear")
+	}
+
+	session := &domain.Session{}
+	if err := dynamodbattribute.UnmarshalMap(result.Items[0], session); err != nil {
+		log.Error().Err(err).Msg("failed to unmarshal session")
+	}
+
+	deleteItemInput := &dynamodb.DeleteItemInput{
+		TableName: aws.String(r.tableName),
+		Key: map[string]*dynamodb.AttributeValue{
+			"id":         {S: aws.String(session.ID)},
+			"expires_at": {N: aws.String(strconv.FormatInt(session.ExpiresAt, 10))},
+		},
+	}
+
+	deleteItemOut, err := r.db.DeleteItemWithContext(ctx, deleteItemInput)
+	if err != nil {
+		log.Error().Err(err).Msg("failed to clear session from DynamoDB")
+		return err
+	}
+	if deleteItemInput.ReturnValues != nil && *deleteItemInput.ReturnValues == "ALL_OLD" {
+		log.Info().Msgf("Clear session: %v", deleteItemOut.Attributes)
+	}
+
+	return nil
 }

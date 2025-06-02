@@ -59,6 +59,7 @@ type UserLogin struct {
 }
 
 type UserAccount struct {
+	Id    string         `json:"id"`
 	Username    string         `json:"username"`
 	DisplayName string `json:"display_name"`
 	Email       string `json:"email"`

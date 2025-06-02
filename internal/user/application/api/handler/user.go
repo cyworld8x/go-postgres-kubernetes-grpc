@@ -29,15 +29,34 @@ func createUser(service users.UseCase) gin.HandlerFunc {
 
 		var req domain.NewUser
 		if err := ctx.ShouldBindJSON(&req); err != nil {
-			ctx.JSON(http.StatusBadRequest, err)
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"status":  "error",
+				"message": "Can't create user",
+				"error": map[string]interface{}{
+					"code":    "user_creation_error",
+					"message": err.Error(),
+				},
+			})
 			return
 		}
-		user, err := service.CreateUser(ctx, req.Username, req.Email, req.DisplayName, req.Password, req.Role)
+		_, err := service.CreateUser(ctx, req.Username, req.Email, req.DisplayName, req.Password, req.Role)
 		if err != nil {
-			ctx.JSON(http.StatusInternalServerError, err)
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"status":  "error",
+				"message": "Can't create user",
+				"error": map[string]interface{}{
+					"code":    "user_creation_error",
+					"message": err.Error(),
+				},
+			})
 			return
 		}
-		ctx.JSON(http.StatusOK, user)
+		ctx.JSON(http.StatusOK, gin.H{
+			"message": "User registered successfully",
+			"status":  "success",
+		})
+		return
+
 	})
 }
 
@@ -52,13 +71,25 @@ func getLogin(uc users.UseCase) gin.HandlerFunc {
 
 		user, err := uc.GetLogin(ctx, req.Username)
 		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"message": "User doesn't exist"})
+			ctx.JSON(http.StatusOK, gin.H{
+				"status": "error",
+				"error": map[string]interface{}{
+					"message": "Can't login with user name and password.",
+					"code":    "LOGIN_ERROR",
+				},
+			})
 			return
 		}
 
 		err = utils.CheckPassword(req.Password, user.Password)
 		if err != nil {
-			ctx.JSON(http.StatusUnauthorized, gin.H{"message": "Can't login with user name and password."})
+			ctx.JSON(http.StatusOK, gin.H{
+				"status": "error",
+				"error": map[string]interface{}{
+					"message": "Can't login with user name and password.",
+					"code":    "LOGIN_ERROR",
+				},
+			})
 			return
 		}
 
@@ -66,6 +97,7 @@ func getLogin(uc users.UseCase) gin.HandlerFunc {
 		token, _, err := maker.CreateToken(user.Username, time.Hour)
 		if err != nil {
 			ctx.JSON(http.StatusInternalServerError, err)
+			return
 		}
 
 		err = uc.GenerateSession(ctx, user.Username, token, time.Hour)
@@ -74,12 +106,16 @@ func getLogin(uc users.UseCase) gin.HandlerFunc {
 			return
 		}
 
-		ctx.JSON(http.StatusOK, &domain.UserAccount{
-			Username:    user.Username,
-			Email:       user.Email.String,
-			DisplayName: user.DisplayName.String,
-			Role:        user.Role,
-			Token:       token,
+		ctx.JSON(http.StatusOK, gin.H{
+			"data": &domain.UserAccount{
+				Id:          user.ID.String(),
+				Username:    user.Username,
+				Email:       user.Email.String,
+				DisplayName: user.DisplayName.String,
+				Role:        user.Role,
+				Token:       token,
+			},
+			"status": "success",
 		})
 	})
 

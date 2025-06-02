@@ -374,3 +374,20 @@ func (mr *MockSessionRepositoryMockRecorder) UpdateSession(ctx, session interfac
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "UpdateSession", reflect.TypeOf((*MockSessionRepository)(nil).UpdateSession), ctx, session)
 }
+
+// UnblockSession mocks base method.
+func (m *MockSessionRepository) UnblockSession(ctx context.Context, sessionID string) (bool, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "UnblockSession", ctx, sessionID)
+	ret0, _ := ret[0].(bool)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+//ClearSession mocks base method.
+func (m *MockSessionRepository) ClearSession(ctx context.Context, token string, username string) error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "ClearSession", ctx, token, username)
+	ret0, _ := ret[0].(error)
+	return ret0
+}

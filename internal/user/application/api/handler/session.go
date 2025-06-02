@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/cyworld8x/go-postgres-kubernetes-grpc/internal/user/usecases/sessions"
@@ -16,7 +17,8 @@ func MakeSessionHandler(router gin.IRouter, uc sessions.UseCase) {
 	pasetoMaker, _ := paseto.NewPasetoMaker()
 	authRoutes := router.Group("/").Use(middleware.AuthMiddleware(pasetoMaker))
 	authRoutes.GET("/sessions/user/:username", getSessionByUserID(uc))
-	authRoutes.DELETE("/session/:id", deleteSession(uc))
+	authRoutes.DELETE("/session/user/:id", deleteSession(uc))
+	authRoutes.DELETE("/session/:username", clearSession(uc))
 	authRoutes.PUT("/session/block/:id", blockSession(uc))
 	authRoutes.POST("/session/renew", renewToken(uc))
 	authRoutes.GET("/sessions", listSessions(uc))
@@ -81,6 +83,55 @@ func blockSession(uc sessions.UseCase) gin.HandlerFunc {
 		} else {
 			ctx.JSON(http.StatusBadRequest, gin.H{"message": "Session could not be blocked"})
 		}
+	})
+}
+
+// clearSession is a placeholder for a function that clears a session.
+
+func clearSession(uc sessions.UseCase) gin.HandlerFunc {
+	return gin.HandlerFunc(func(ctx *gin.Context) {
+		token := ctx.GetHeader("Authorization")
+		if token == "" {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"status": "error",
+				"error": gin.H{
+					"message": "Request is invalid",
+					"code":    "BAD_REQUEST",
+				}})
+			return
+		}
+		prefix := "Bearer "
+		if !strings.HasPrefix(token, prefix) {
+			ctx.JSON(http.StatusBadRequest, gin.H{
+				"status": "error",
+
+				"error": gin.H{
+					"message": "Request is invalid",
+					"code":    "BAD_REQUEST",
+				}})
+			return
+		}
+
+		username := ctx.Param("username")
+		if username == "" {
+			ctx.JSON(http.StatusBadRequest, gin.H{"error": "Request is invalid"})
+			return
+		}
+
+		err := uc.ClearSession(ctx, strings.TrimPrefix(token, prefix), username)
+		if err != nil {
+			ctx.JSON(http.StatusInternalServerError, gin.H{
+				"status": "error",
+				"error": gin.H{
+					"message": "Failed to clear session" + err.Error(),
+					"code":    "INTERNAL_SERVER_ERROR",
+				},
+			})
+			return
+		}
+		ctx.JSON(http.StatusOK, gin.H{
+			"status": "success",
+		})
 	})
 }
 
