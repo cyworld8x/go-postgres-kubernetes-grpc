@@ -59,7 +59,7 @@ jobs:
           source: |
             ${{ env.APP_NAME }}
             cmd/user/config/app.env
-          target: ${{ env.NEW_DIR }}
+          target: ${{ env.APP_NAME }}
 
       - name: SSH and deploy with backup + rollback
         uses: appleboy/ssh-action@v1.0.0
