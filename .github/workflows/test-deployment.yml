@@ -1,0 +1,121 @@
+name: Deploy Go App (with artifacts + backup)
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  APP_NAME: user-api
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+
+      - name: Build Go application
+        run: |
+          mkdir -p build
+          go build -o build/$APP_NAME ./cmd/user
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: go-app
+          path: |
+            build/${{ env.APP_NAME }}
+            cmd/user/config/app.env
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    env:
+      APP_NAME: user-api
+      SERVICE_NAME: ${{ env.APP_NAME }}.service
+      CURRENT_DIR: /opt/app/build
+      NEW_DIR: /opt/app/new
+      BACKUP_DIR: /opt/app/backup
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: go-app
+
+      - name: Upload app files to EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          source: |
+            ${{ env.APP_NAME }}
+            cmd/user/config/app.env
+          target: ${{ env.NEW_DIR }}
+
+      - name: SSH and deploy with backup + rollback
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_PRIVATE_KEY }}
+          port: ${{ secrets.EC2_PORT }}
+          script: |
+            echo "Backing up current app..."
+            if [ -d "$CURRENT_DIR" ]; then
+              sudo rm -rf $BACKUP_DIR
+              sudo mv $CURRENT_DIR $BACKUP_DIR
+              echo "Backup saved to $BACKUP_DIR"
+            fi
+
+            echo "Deploying new app..."
+            sudo mv $NEW_DIR $CURRENT_DIR
+
+            echo "Setting up systemd service..."
+            sudo tee /etc/systemd/system/$SERVICE_NAME > /dev/null <<EOF
+            [Unit]
+            Description=Go User API Service
+            After=network.target
+
+            [Service]
+            User=${{ secrets.EC2_USER }}
+            WorkingDirectory=$CURRENT_DIR
+            ExecStart=$CURRENT_DIR/$APP_NAME
+            Restart=on-failure
+            RestartSec=5
+            StandardOutput=journal
+            StandardError=journal
+            SyslogIdentifier=$APP_NAME
+
+            [Install]
+            WantedBy=multi-user.target
+            EOF
+
+            echo "Reloading systemd..."
+            sudo systemctl daemon-reload
+
+            echo "Restarting service..."
+            sudo systemctl stop $SERVICE_NAME || true
+            if sudo systemctl start $SERVICE_NAME; then
+              echo "Service started successfully."
+            else
+              echo "Service failed to start! Rolling back..."
+              sudo rm -rf $CURRENT_DIR
+              sudo mv $BACKUP_DIR $CURRENT_DIR
+              sudo systemctl start $SERVICE_NAME
+              echo "Rollback complete."
+              exit 1
+            fi
+
+            echo "Reloading nginx..."
+            sudo systemctl reload nginx
+
+            echo "Deployment complete!"
