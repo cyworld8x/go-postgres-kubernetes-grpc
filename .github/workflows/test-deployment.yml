@@ -30,7 +30,7 @@ jobs:
         with:
           name: go-app
           path: |
-            build/${{ env.APP_NAME }}
+            build/user-api
             cmd/user/config/app.env
 
   deploy:
@@ -38,7 +38,7 @@ jobs:
     needs: build
     env:
       APP_NAME: user-api
-      SERVICE_NAME: ${{ env.APP_NAME }}.service
+      SERVICE_NAME: user-api.service
       CURRENT_DIR: /opt/app/build
       NEW_DIR: /opt/app/new
       BACKUP_DIR: /opt/app/backup
@@ -59,7 +59,7 @@ jobs:
           source: |
             ${{ env.APP_NAME }}
             cmd/user/config/app.env
-          target: ${{ env.APP_NAME }}
+          target: /opt/app/new
 
       - name: SSH and deploy with backup + rollback
         uses: appleboy/ssh-action@v1.0.0
